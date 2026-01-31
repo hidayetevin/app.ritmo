@@ -101,9 +101,9 @@ export class AdService {
     async showBanner() {
         const options: BannerAdOptions = {
             adId: this.bannerId,
-            adSize: BannerAdSize.ADAPTIVE_BANNER,
+            adSize: BannerAdSize.BANNER, // Standart 50px yükseklik (daha tahmin edilebilir)
             position: BannerAdPosition.BOTTOM_CENTER,
-            margin: 60, // Navigasyonun üzerine oturması için
+            margin: 120, // Navigasyonun çok daha üzerine (garanti payı ile)
             isTesting: false
         };
         await AdMob.showBanner(options);

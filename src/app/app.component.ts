@@ -35,6 +35,6 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.adService.showBanner();
+    // Banner ad removed as per user request
   }
 }
