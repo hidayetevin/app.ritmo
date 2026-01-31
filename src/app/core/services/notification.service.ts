@@ -10,8 +10,30 @@ export class NotificationService {
     constructor() { }
 
     async requestPermissions() {
-        const perm = await LocalNotifications.requestPermissions();
-        return perm.display === 'granted';
+        try {
+            await this.createChannel();
+            const perm = await LocalNotifications.requestPermissions();
+            return perm.display === 'granted';
+        } catch (e) {
+            console.error('Permission Error:', e);
+            return false;
+        }
+    }
+
+    async createChannel() {
+        try {
+            await LocalNotifications.createChannel({
+                id: 'rutin_channel',
+                name: 'Rutin Bildirimleri',
+                description: 'Rutin zamanı hatırlatmaları',
+                importance: 5,
+                visibility: 1,
+                vibration: true,
+                sound: 'beep.wav'
+            });
+        } catch (e) {
+            console.error('Channel Error:', e);
+        }
     }
 
     // String ID'den (UUID) Integer ID üretir (Hash)
@@ -30,18 +52,18 @@ export class NotificationService {
         // Önce bu rutine ait eski bildirimleri temizle
         await this.cancelRoutine(routine);
 
-        if (!routine.isActive) return;
+        if (!routine.isActive === false) return;
 
         const notifications: any[] = [];
         const [hours, mins] = routine.time.split(':').map(Number);
 
-        // Temel bildirim şablonu
+        // Temel bildirim şablonu (id kısmını kaldırdık, override olmasın diye)
         const baseObj = {
             title: 'Rutin Zamanı! 🔔',
             body: `Hadi, "${routine.title}" rutinini yapma zamanı.`,
-            sound: 'beep.wav', // Varsayılan ses
+            channelId: 'rutin_channel',
             schedule: {
-                allowWhileIdle: true // Doze modunda bile çalsın
+                allowWhileIdle: true
             }
         };
 
@@ -105,10 +127,11 @@ export class NotificationService {
                     calcDate.setDate(today.getDate() + daysToAdd);
                 }
 
-                // 60 gün ileriye kadar (veya 30 kullanım) planla
+                // 30 kullanım veya 60 gün ileriye kadar planla
                 for (let i = 0; i < 30; i++) {
                     calcDate.setHours(hours, mins, 0, 0);
 
+                    // Bitiş tarihi kontrolü
                     if (routine.endDate && calcDate > new Date(routine.endDate)) break;
 
                     notifications.push({
