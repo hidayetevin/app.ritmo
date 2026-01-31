@@ -91,29 +91,45 @@ export class StatisticsComponent implements OnInit {
 
         const pieCtx = document.getElementById('colorChart') as HTMLCanvasElement;
         if (pieCtx) {
-            const colorCounts: { [key: string]: number } = {};
-            this.routines().forEach(r => {
-                colorCounts[r.color] = (colorCounts[r.color] || 0) + 1;
-            });
+            // Aktif olan tüm rutinleri al
+            const activeData = this.routines()
+                .filter(r => r.isActive !== false && (r.completionHistory?.length || 0) > 0) // Sadece aktif ve EN AZ 1 KERE tamamlanmışlar
+                .map(r => ({
+                    title: r.title,
+                    count: r.completionHistory?.length || 0,
+                    color: r.color
+                }));
 
-            new Chart(pieCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(colorCounts),
-                    datasets: [{
-                        data: Object.values(colorCounts),
-                        backgroundColor: Object.keys(colorCounts),
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, usePointStyle: true } }
+            // Eğer hiç veri yoksa (count toplamı 0 ise) grafik boş görünür.
+            // Bu durumda 'Henüz Veri Yok' gibi bir şey göstermek lazım ama şimdilik tüm rutinleri gönderelim.
+
+            if (activeData.length > 0) {
+                new Chart(pieCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: activeData.map(d => d.title),
+                        datasets: [{
+                            data: activeData.map(d => d.count),
+                            backgroundColor: activeData.map(d => d.color),
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 12,
+                                    usePointStyle: true,
+                                    font: { size: 11 }
+                                }
+                            }
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
 }
