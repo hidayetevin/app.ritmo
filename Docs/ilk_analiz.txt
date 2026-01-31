@@ -1,0 +1,138 @@
+
+
+Android platformda çalışacak "rutin hatırlatıcı" bir uygulama yapmak istiyorum. 
+Teknik detaylar:
+
+Uygulama Detayları aşağıda:
+- Genel ekran tasarımı:
+	- Ekran tasarımı kullanıcı dostu ve modern olacak.
+	- Ekran genel olarak header, body ve footer dan oluşacak.
+	- Header alanında banner reklam koyacağız.
+	- Body alanında ekranlar görüntülenecek.
+	- Footer da yani alt tarafta navigation bar olsun. Burada Ana ekran, Takvim, Rutinlerim ve hesap ikonları olsun. Sayfalar arası geçiş buradan yapılsın.
+	- Bu tasarım genel template olacak, diğer ekranlar body içerisinde görüntülenecek. Genel görünüm aşağıdaki gibi olacak.
+	---------------------
+	|		header		|
+	---------------------
+	|					|
+	|					|
+	|		body		|
+	|					|
+	|					|
+	|					|
+	|					|
+	|					|
+	|					|
+	|					|
+	---------------------
+	|		footer		|
+	---------------------
+- Rutinlerim ekranı:
+	- Bu ekranda kişi tanımladığı rutinleri 2*n lik bir grid ile görecek.
+	- Her hücrede bir rutin yazıyor olacak.
+	- Hücre görünümünü aşağıdaki gibi düşünüyorum.
+		Rutin adı: 1 satır, sığmazsa 2 satır olabilir.
+		Rutin günleri: Rutin hangi günlerde seçilmiş ise onlar görünecek.
+			ÖRneğin: hergün, haftaiçi(haftaiçi günler seçilmiş ise), ve rasgele günler seçilmiş ise kısaltılmış gün adlarını virgül ile ayırarak
+		Gümcelle: Bu butona tıklayınca güncelleme ekranına geçsin ve güncellemesine izin versin. Burada güncelle ikonu kullan
+		Genel olarak rutinlerim ekranı tasarımı
+			---------------------
+			|		header		|
+			---------------------
+			| ------- --------	|
+			| |		| |		 |	|
+			| |	cell| |cell	 |  |
+			| |		| |		 |	|
+			| ------- -------	|
+			| ------- --------	|
+			| |		| |		 |	|
+			| |	cell| |cell	 |  |
+			| |		| |		 |	|
+			| ------- -------	|
+			| ------- --------	|
+			| |		| |		 |	|
+			| |cell	| |cell	 |  |
+			| |		| |		 |	|
+			| ------- -------	|
+			---------------------
+			|		footer		|
+			---------------------
+			cell tasarımı:
+			  -------------------
+			  |	 	Rutin       | 
+			  |	     Adı        | 
+			  |	Rutin günleri   | 
+			  |	Nekadar sonra   | 
+			  |	       güncelle | 
+			  -------------------
+	- Hücre görünümünü için fikirlerin varsa sun.
+- Rutin ekle ekranı:
+	 - Bu ekranda yeni rutin eklenebilmektedir.
+	 - Bu ekran aynı zamanda güncelleme içinde kullanılacak yani bunu component olarak tasarla. Tekrar kullanılabilir olsun yani.
+	 - Bu ekranda olacak alanlar:
+		Rutin rengi: Color palette
+		Rutin adı: textbox
+		Rutin başlangıç tarihi: datetime 
+		Rutin bitiş: datetime
+		Rutin şekli (başka bir isim önerisinde bulunabilirsin): combobox (bu alanda rutini ne sıklıkla yapcağını seçecek. Yani hergün veya ayda bir gibi. Bu yüzden burada senden öneri bekliyorum. Kullanıcı dostu bir tasarım olmalı)
+	 - En altta da kaydet butonu(bu butona basınca rutin kaydedilecek) ve iptal butonu(bu butona basınca iptal edilecektir emin misiniz diye soracak, evet derse iptal edecek hayır derse soru  modalını kapatacak rutin ekleme ekranından devam edecek)
+	 
+- Ana ekranda uygulama hakkında bilgi ve nasıl kullanıldığı anlatılacak.
+- Takvim ekranı: Bu ekranda calender charts tarzı bişey kullanmak istiyorum. Bunun için ücretsiz ve görünümü en güzel kütüphaneyi bul ve kullan.
+	- Bu ekranda günlük haftalık ve aylık görünümler olacak. Bu görünümlere rutinler gün ve saatine uygun şekilde takvime yerleştirilecek.
+- Hesap ekranı:
+	- Bu ekranda kullanıcı ismi, ve uygulama ayarları olacak.
+	- Uygulama ayarları:
+		- Karanlık Mod: Switch button olabilir. AÇık ise karanlık mod aktif, kapalı ise pasif
+		- Uygulama dili: Şuan Türkçe ve ingilizce olacak. Burada hangi dil seçilirse uygulamada tüm metinler(kullanıcının girdiği hariç) bu dile uygun şekilde değişecek.
+		- Titreşim: Switch button olabilir. Açık ise tıklama titreşimi aktif, kapalı ise pasif
+		- Sesler: Switch button olabilir. Açık ise tıklamalarda çıkan sesler aktif, kapalı ise pasif.
+		
+Teknik detaylar: 
+## Teknik Analiz için aşağıdakileri kullan
+
+### Teknoloji Stack
+
+#### Frontend Framework
+- **Phaser.js v3.80+**: Oyun motoru
+  - Canvas tabanlı rendering
+  - Tween animasyon sistemi
+  - Sahne yönetimi
+  - Asset yönetimi
+
+#### Programlama Dili
+- **TypeScript**: Strict mode
+  - Type safety
+  - Interface ve enum desteği
+  - Path aliases
+  - Modern ES özellikleri
+
+#### Build Tools
+- **Vite v5.0+**: Modern build tool
+  - Hot Module Replacement (HMR)
+  - Fast refresh
+  - Optimized production builds
+  - ES modules desteği
+
+#### Kod Kalitesi
+- **ESLint**: TypeScript linting
+  - Strict kurallar
+  - Clean code enforcement
+  - Complexity checks
+- **Prettier**: Kod formatlama
+  - Consistent style
+  - Auto-formatting
+
+#### Test Framework
+- **Vitest**: Unit testing
+  - Coverage reporting
+  - Fast execution
+  - TypeScript desteği
+
+### Teknik Gereksinimler
+- Node.js 18+
+- Modern web tarayıcısı (Chrome, Firefox, Safari, Edge)
+- LocalStorage desteği
+- Canvas API desteği
+
+Tüm kodlar clean code architecture kurallarına uygun olarak tasarlanacak.

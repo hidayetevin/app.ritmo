@@ -1,0 +1,119 @@
+<div class="modal d-block" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold text-primary">{{ routineToEdit ? 'Rutin Güncelle' : 'Yeni Rutin Ekle' }}
+                </h5>
+                <button type="button" class="btn-close" aria-label="Close" (click)="cancel.emit()"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+                    <!-- Title -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Rutin Adı</label>
+                        <input type="text" class="form-control form-control-lg fw-bold" formControlName="title"
+                            placeholder="Örn: Su İç, Kitap Oku...">
+                    </div>
+
+                    <div class="row">
+                        <!-- Color -->
+                        <div class="col-md-12 mb-4">
+                            <label class="form-label fw-bold small text-muted d-block">Renk Seç</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                @for (c of colors; track c) {
+                                <div class="color-circle" [style.background-color]="c"
+                                    [class.selected]="form.get('color')?.value === c"
+                                    (click)="form.patchValue({color: c})">
+                                    @if(form.get('color')?.value === c) {
+                                    <i class="bi bi-check text-white"></i>
+                                    }
+                                </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Frequency -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold small text-muted">Sıklık</label>
+                            <select class="form-select" formControlName="frequencyType">
+                                @for (f of frequencies; track f) {
+                                <option [value]="f.value">{{ f.label }}</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Time -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold small text-muted">Saat</label>
+                            <input type="time" class="form-control" formControlName="time">
+                        </div>
+                    </div>
+
+                    <!-- Specific Days -->
+                    @if (form.get('frequencyType')?.value === 'SPECIFIC_DAYS') {
+                    <div class="mb-3 p-3 bg-light rounded">
+                        <label class="d-block small fw-bold text-muted mb-2">Günler</label>
+                        <div class="btn-group w-100" role="group">
+                            @for (day of days; track day) {
+                            <button type="button" class="btn btn-sm"
+                                [class.btn-primary]="form.value.specificDays?.includes(day.index)"
+                                [class.btn-outline-secondary]="!form.value.specificDays?.includes(day.index)"
+                                (click)="toggleDay(day.index)">
+                                {{ day.name }}
+                            </button>
+                            }
+                        </div>
+                    </div>
+                    }
+
+                    <!-- Interval -->
+                    @if (form.get('frequencyType')?.value === 'INTERVAL') {
+                    <div class="mb-3 p-3 bg-light rounded">
+                        <label class="form-label fw-bold small text-muted">Kaç günde bir?</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" formControlName="intervalDays" min="2">
+                            <span class="input-group-text">günde bir</span>
+                        </div>
+                    </div>
+                    }
+
+                    <!-- Start Date -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted">Başlangıç Tarihi</label>
+                        <input type="date" class="form-control" formControlName="startDate">
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="button" class="btn btn-light me-md-2" (click)="cancel.emit()">İptal</button>
+                        <button type="submit" class="btn btn-primary px-4" [disabled]="form.invalid">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .color-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid transparent;
+        transition: transform 0.2s;
+    }
+
+    .color-circle:hover {
+        transform: scale(1.1);
+    }
+
+    .color-circle.selected {
+        border-color: #333;
+        transform: scale(1.1);
+    }
+</style>

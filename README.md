@@ -1,237 +1,186 @@
-# Ritmo – Development Guide & Quick Reference
+# RutinApp - README
 
-## 🚀 Quick Start
+## 📱 Proje Hakkında
 
-### Development
+**RutinApp**, günlük rutinlerinizi takip etmenizi ve organize etmenizi sağlayan, modern ve kullanıcı dostu bir Android uygulamasıdır. Angular 19 ve Capacitor ile geliştirilmiştir.
+
+---
+
+## 🚀 Özellikler
+
+### ✅ Tamamlanan Özellikler (v1.0 MVP)
+
+- **Rutin Yönetimi**
+  - Rutin ekleme, düzenleme ve silme
+  - 8 farklı renk seçeneği
+  - Esnek sıklık ayarları (Günlük, Hafta İçi, Hafta Sonu, Özel Günler, Aralıklı)
+  
+- **Takvim Görünümü**
+  - Günlük Liste: Seçilen günün rutinlerini görüntüleme
+  - Aylık Takvim: FullCalendar ile görsel takvim
+  - Tıkla-tamamla özelliği (hem liste hem takvimde)
+  
+- **Bildirimler**
+  - Capacitor Local Notifications ile rutin hatırlatıcıları
+  - Otomatik bildirim zamanlama
+  
+- **Ayarlar**
+  - Karanlık mod (veri kaydı)
+  - Bildirim, ses ve titreşim ayarları
+  - Dil seçimi (Türkçe/İngilizce)
+  
+- **Veri Saklama**
+  - LocalStorage ile kalıcı veri
+  - Angular Signals ile reaktif state yönetimi
+
+### 🚧 Planlanmış Özellikler (v2.0)
+
+- Karanlık mod CSS implementasyonu
+- İstatistik ve rapor ekranı
+- Özel uygulama ikonu ve splash screen
+- Cloud yedekleme (Firebase/Google Drive)
+- Detaylı bildirim ayarları
+
+---
+
+## 🛠 Teknoloji Yığını
+
+| Kategori | Teknoloji |
+|----------|-----------|
+| Framework | Angular 19 (Standalone Components) |
+| Dil | TypeScript 5+ |
+| UI | Bootstrap 5 + Bootstrap Icons |
+| Mobil | Capacitor 7.x |
+| Takvim | FullCalendar |
+| Bildirim | Capacitor Local Notifications |
+| Reklam | Google AdMob |
+| State | Angular Signals |
+| Veri | LocalStorage |
+
+---
+
+## 📦 Kurulum ve Çalıştırma
+
+### Gereksinimler
+- Node.js 18+
+- npm veya yarn
+- Android Studio (APK build için)
+
+### 1. Bağımlılıkları Yükle
 ```bash
+cd d:/PROJECTS/PROJE_FIKIRLERI/RutinApp
 npm install
-npm run dev
-# Browser: http://localhost:5173/
 ```
 
-### Production Build
+### 2. Localhost'ta Çalıştır
 ```bash
-npm run build
-npm run preview
+npm start
+# Tarayıcıda http://localhost:4200 açılır
 ```
 
-### Android APK
+### 3. Android APK Oluştur
 ```bash
+# 1. Angular app'i build et
 npm run build
+
+# 2. Capacitor ile senkronize et
 npx cap sync
+
+# 3. Android Studio'da aç
 npx cap open android
-# Build → Build APK in Android Studio
+
+# Android Studio'da:
+# - Gradle Sync tamamlanmasını bekle
+# - Build > Build Bundle(s) / APK(s) > Build APK(s)
 ```
 
 ---
 
-## 📁 Project Structure
+## 📂 Proje Yapısı
 
 ```
-src/
-├── core/               # Game logic (13 files)
-│   ├── SceneManager.js        # Three.js scene setup
-│   ├── CameraManager.js       # Camera follow & lerp
-│   ├── Player.js              # Player controls & physics
-│   ├── GameLoop.js            # Main update loop
-│   ├── ObstacleFactory.js     # Object pooling for rings
-│   ├── CollisionSystem.js     # AABB collision detection
-│   ├── GameState.js           # Score, combo, progression
-│   ├── BonusSystem.js         # Powerups & gems
-│   ├── DifficultyManager.js   # Progressive difficulty
-│   ├── ThemeManager.js        # Biome transitions
-│   ├── StorageManager.js      # LocalStorage manager
-│   ├── DailyTaskManager.js    # LiveOps tasks
-│   ├── AudioManager.js        # Web Audio API
-│   └── HapticManager.js       # Vibration feedback
-├── ui/                 # UI components (3 files)
-│   ├── Menu.js                # Main menu
-│   ├── HUD.js                 # In-game UI
-│   └── GameOver.js            # Game over screen
-├── main.js             # Entry point
-└── style.css           # Responsive CSS
-```
-
----
-
-## 🎮 Implemented Features
-
-### ✅ Core Gameplay
-- [x] Endless falling mechanic
-- [x] Swipe controls (relative movement)
-- [x] Ring obstacles (object pooling)
-- [x] AABB collision detection
-- [x] Perfect Pass system (center bonus)
-- [x] Combo multiplier (exponential scoring)
-- [x] Difficulty progression (every 10 rings)
-
-### ✅ Power-ups & Collectibles
-- [x] Slow Motion (3s)
-- [x] Shield (1 hit protection)
-- [x] Magnet (5s, attracts gems)
-- [x] Gems (shop currency)
-- [x] Spawn rates: 10% powerups, 5% gems
-
-### ✅ Visual & Polish
-- [x] Biome transitions (Sky → Space → Void)
-- [x] Theme system (Minimal, Neon, Kids)
-- [x] Fog & lighting changes
-- [x] Audio feedback (Web Audio API)
-- [x] Haptic feedback (vibration)
-
-### ✅ Meta-Progression
-- [x] High score tracking
-- [x] Persistent gem storage
-- [x] Stats tracking (games played, rings passed, etc.)
-- [x] Daily Tasks (3 random tasks/day)
-- [x] Task types: Score, Rings, Gems, Perfect, Combo, Games
-
-### ✅ UI/UX
-- [x] Responsive design (mobile-first)
-- [x] Touch-friendly (44x44px min targets)
-- [x] Safe area support (notched devices)
-- [x] Menu, HUD, GameOver screens
-- [x] CSS variables for scalability
-
----
-
-## 🔧 Technical Details
-
-### Performance Optimizations
-- Object pooling (20 rings)
-- No physics engine (pure math)
-- PixelRatio clamped to 2
-- Single scene architecture
-- Efficient AABB collision
-
-### Mobile Optimization
-```javascript
-// Renderer setup
-powerPreference: "high-performance"
-this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-```
-
-### Storage (Base64 Encoded)
-```javascript
-localStorage.setItem('endless_drop_data', btoa(JSON.stringify(data)));
-```
-
-### Responsive CSS Variables
-```css
---font-size-h1: clamp(32px, 8vw, 56px);
---btn-padding: clamp(12px, 3vw, 20px) clamp(30px, 6vw, 60px);
+RutinApp/
+├── src/
+│   ├── app/
+│   │   ├── core/
+│   │   │   ├── models/          # Veri modelleri (Routine, UserSettings)
+│   │   │   └── services/        # StorageService, NotificationService
+│   │   ├── features/
+│   │   │   ├── home/            # Ana sayfa
+│   │   │   ├── routines/        # Rutin listesi ve modal
+│   │   │   ├── calendar/        # Takvim (2 tab)
+│   │   │   └── settings/        # Ayarlar
+│   │   ├── layout/
+│   │   │   ├── header/          # Üst bar
+│   │   │   ├── footer/          # Alt navigasyon
+│   │   │   └── main-layout/     # Ana layout wrapper
+│   │   ├── app.component.ts     # Root component
+│   │   └── app.routes.ts        # Routing yapılandırması
+│   └── styles.scss              # Global stiller
+├── android/                     # Capacitor Android projesi
+├── Docs/
+│   └── analiz.md                # Teknik analiz dökümanı
+└── implementation_plan.md       # Geliştirme planı
 ```
 
 ---
 
-## 📊 Game State Flow
+## 🎨 Ekran Görüntüleri
 
-```
-MENU → startGame() → PLAYING → collision → doGameOver() → GAME_OVER
-  ↑                                                            ↓
-  └─────────────────── restartGame() / showMenu() ────────────┘
-```
+*(Buraya ekran görüntüleri eklenecek)*
 
 ---
 
-## 🎯 Daily Tasks System
+## 📝 Geliştirme Notları
 
-**Task Pool:**
-- Score 500/1000
-- Pass 20/50 rings
-- Collect 10 gems
-- 5/10 perfect passes
-- Play 3 games
-- 5x combo
+### Önemli Servisler
 
-**Reset:** Midnight (00:00)
-**Reward:** Gems for shop
+#### StorageService
+- Rutinleri ve kullanıcı ayarlarını yönetir
+- Angular Signals kullanarak reaktif state sağlar
+- LocalStorage'a otomatik kaydeder
 
----
+#### NotificationService
+- Capacitor Local Notifications ile bildirim zamanlar
+- Şu an sadece DAILY frekansı için tam destek
+- Gelecekte tüm frekans tipleri için geliştirilecek
 
-## 🔊 Audio Events
-
-| Event | Sound | Haptic |
-|-------|-------|--------|
-| Perfect Pass | High beep (880Hz) | Medium |
-| Normal Pass | Mid beep (440Hz) | - |
-| Gem Collect | High beep (660Hz) | Light |
-| Powerup | Very high (1200Hz) | Medium |
-| Crash | Low buzz (110Hz) | Error pattern |
-| Shield Save | Powerup sound | Light |
+### Bilinen Sınırlamalar (MVP)
+- Karanlık mod veri kaydediliyor ama CSS henüz uygulanmıyor
+- Bildirimler sadece günlük rutinler için çalışıyor
+- Dil değiştirme sadece UI'da, backend logic yok
 
 ---
 
-## 📱 Supported Devices
+## 🐛 Hata Ayıklama
 
-- ✅ iPhone SE (375px) → iPad Pro (1024px)
-- ✅ Portrait & Landscape
-- ✅ Notched devices (iPhone X+)
-- ✅ Android (all sizes)
+### AdMob Hatası
+Eğer `Missing application ID` hatası alıyorsanız:
+1. `android/app/src/main/AndroidManifest.xml` dosyasını kontrol edin
+2. `<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID"` satırını arayın
+3. Test ID: `ca-app-pub-3940256099942544~3347511713`
 
----
+### Build Hatası
+Eğer `npm run build` başarısız olursa:
+```bash
+# Cache temizle
+npm cache clean --force
 
-## 🚧 Optional/Future Features
-
-- [ ] AdMob integration
-- [ ] Shop UI (buy skins/trails with gems)
-- [ ] Daily Tasks popup UI
-- [ ] GLB model loading (rings use TorusGeometry)
-- [ ] Particle effects
-- [ ] Background music
-- [ ] Social features (leaderboard)
-
----
-
-## 📦 Dependencies
-
-```json
-{
-  "dependencies": {
-    "three": "latest",
-    "@capacitor/core": "latest",
-    "@capacitor/android": "latest",
-    "@capacitor/haptics": "latest"
-  },
-  "devDependencies": {
-    "vite": "latest"
-  }
-}
+# Node modules yeniden yükle
+rm -rf node_modules
+npm install
 ```
 
 ---
 
-## 🎓 Code Quality Rules
+## 📄 Lisans
 
-1. **Clean Code:** Self-documenting, single responsibility
-2. **Modular:** Each manager handles one concern
-3. **No Global State:** Dependency injection
-4. **Mobile-First:** Always consider performance
-5. **Responsive:** Use CSS variables, not hardcoded values
+Bu proje özel bir projedir.
 
 ---
 
-## 🐛 Common Issues & Solutions
+## 👨‍💻 Geliştirici
 
-**Issue:** Black screen on mobile
-**Fix:** Check console, ensure audio context resumed on first touch
+Geliştirme tarihi: Ocak 2026
 
-**Issue:** Controls not working
-**Fix:** Verify `touch-action: none` in CSS
-
-**Issue:** APK crashes
-**Fix:** Check Android logcat, ensure Capacitor sync
-
-**Issue:** Text too small on tablet
-**Fix:** CSS variables auto-scale with `clamp()`
-
----
-
-## 📄 License
-
-MIT (Three.js compatible)
-
----
-
-**Current Status:** ✅ READY FOR TESTING  
-**Completion:** 95% (Core game complete, optional features pending)
+**Son Güncelleme:** 31 Ocak 2026, 20:33

@@ -1,0 +1,40 @@
+<nav class="navbar fixed-bottom navbar-light bg-light border-top shadow-lg">
+    <div class="container-fluid d-flex justify-content-around">
+
+        <a routerLink="/home" routerLinkActive="active"
+            class="btn btn-link text-decoration-none text-dark d-flex flex-column align-items-center">
+            <i class="bi bi-house fs-4"></i>
+            <span class="small">Ana Sayfa</span>
+        </a>
+
+        <a routerLink="/calendar" routerLinkActive="active"
+            class="btn btn-link text-decoration-none text-dark d-flex flex-column align-items-center">
+            <i class="bi bi-calendar-event fs-4"></i>
+            <span class="small">Takvim</span>
+        </a>
+
+        <a routerLink="/routines" routerLinkActive="active"
+            class="btn btn-link text-decoration-none text-dark d-flex flex-column align-items-center">
+            <i class="bi bi-list-check fs-4"></i>
+            <span class="small">Rutinler</span>
+        </a>
+
+        <a routerLink="/settings" routerLinkActive="active"
+            class="btn btn-link text-decoration-none text-dark d-flex flex-column align-items-center">
+            <i class="bi bi-person-gear fs-4"></i>
+            <span class="small">Hesap</span>
+        </a>
+
+    </div>
+</nav>
+
+<style>
+    .active {
+        color: var(--bs-primary) !important;
+        font-weight: bold;
+    }
+
+    .active i {
+        color: var(--bs-primary) !important;
+    }
+</style>

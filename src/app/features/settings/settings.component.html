@@ -1,0 +1,73 @@
+<div class="container py-3">
+    <h4 class="mb-4 fw-bold">Ayarlar</h4>
+
+    <div class="list-group shadow-sm">
+
+        <!-- Dark Mode -->
+        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-moon-fill me-3 fs-5 text-secondary"></i>
+                <span class="fw-medium">Karanlık Mod</span>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" [ngModel]="storage.settings().isDarkMode"
+                    (ngModelChange)="toggleDarkMode($event)">
+            </div>
+        </div>
+
+        <!-- Language -->
+        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-translate me-3 fs-5 text-secondary"></i>
+                <span class="fw-medium">Dil</span>
+            </div>
+            <select class="form-select form-select-sm w-auto border-0 bg-light fw-bold text-primary">
+                <option value="tr" selected>Türkçe</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+
+        <!-- Notifications -->
+        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-bell-fill me-3 fs-5 text-secondary"></i>
+                <span class="fw-medium">Bildirimler</span>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch"
+                    [ngModel]="storage.settings().notificationsEnabled" (ngModelChange)="toggleNotifications($event)">
+            </div>
+        </div>
+
+        <!-- Sounds -->
+        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-volume-up-fill me-3 fs-5 text-secondary"></i>
+                <span class="fw-medium">Ses Efektleri</span>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch"
+                    [ngModel]="storage.settings().soundEnabled" (ngModelChange)="toggleSound($event)">
+            </div>
+        </div>
+
+        <!-- Vibration -->
+        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-phone-vibrate-fill me-3 fs-5 text-secondary"></i>
+                <span class="fw-medium">Titreşim</span>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch"
+                    [ngModel]="storage.settings().vibrationEnabled" (ngModelChange)="toggleVibration($event)">
+            </div>
+        </div>
+
+    </div>
+
+    <!-- App Info -->
+    <div class="text-center mt-5">
+        <p class="text-muted small mb-0">RutinApp v1.0.0</p>
+        <p class="text-muted small">Designed for You</p>
+    </div>
+</div>
