@@ -100,45 +100,59 @@ export class CalendarComponent {
     const events: EventInput[] = [];
 
     const startRange = new Date(info.start);
+    startRange.setHours(0, 0, 0, 0);
+
     const endRange = new Date(info.end);
+    endRange.setHours(0, 0, 0, 0);
 
     routines.forEach(routine => {
-      if (!routine.isActive) return;
+      // Varsayılan isActive: true
+      if (routine.isActive === false) return;
 
       const rStart = new Date(routine.startDate);
       rStart.setHours(0, 0, 0, 0);
 
+      // Başlangıç tarihi, takvim aralığının sonundan büyükse hiç döngüye girme (Optimizasyon)
+      if (rStart >= endRange) return;
+
+      // Döngüyü optimum yerden başlat:
+      // Eğer rutin başlangıcı, takvim başlangıcından sonraysa rutin başlangıcını baz al.
+      // Değilse takvim başlangıcını baz al.
       let current = new Date(startRange < rStart ? rStart : startRange);
       current.setHours(0, 0, 0, 0);
 
-      const safetyLimit = 1000;
+      // Sonsuz döngü koruması (1 yıl)
+      const safetyLimit = 366;
       let count = 0;
 
       while (current < endRange && count < safetyLimit) {
         count++;
 
+        // isRoutineDue zaten tarih kontrollerini yapıyor
         if (this.isRoutineDue(routine, current, rStart)) {
           const dateStr = current.toISOString().split('T')[0];
           const isDone = (routine.completionHistory || []).includes(dateStr);
 
-          // Set time
+          // Rutin saatini ayarla
           const [hours, mins] = routine.time.split(':').map(Number);
           const eventDate = new Date(current);
           eventDate.setHours(hours, mins);
 
           events.push({
+            id: routine.id,
             title: isDone ? `✔ ${routine.title}` : routine.title,
             start: eventDate.toISOString(),
-            color: isDone ? '#28a745' : routine.color, // Green if done
+            color: isDone ? '#198754' : routine.color, // Bootstrap success color
             extendedProps: {
               routineId: routine.id,
-              originalColor: routine.color
+              originalColor: routine.color,
+              isDone: isDone
             },
             allDay: false
           });
         }
 
-        // Next day
+        // Bir sonraki güne geç
         current.setDate(current.getDate() + 1);
       }
     });
