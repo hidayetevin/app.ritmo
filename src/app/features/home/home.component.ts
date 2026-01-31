@@ -2,6 +2,8 @@ import { Component, inject, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { StorageService } from '../../core/services/storage.service';
 import { TranslationService } from '../../core/services/translation.service';
+import { AdService } from '../../core/services/ad.service';
+import { Router } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Routine } from '../../core/models/routine.model';
 
@@ -15,8 +17,16 @@ import { Routine } from '../../core/models/routine.model';
 export class HomeComponent {
   storage = inject(StorageService);
   t = inject(TranslationService);
+  private adService = inject(AdService);
+  private router = inject(Router);
 
   today = new Date();
+
+  goToAdd() {
+    this.adService.showRewardedAd().finally(() => {
+      this.router.navigate(['/routines']);
+    });
+  }
   todayIso = this.today.toISOString().split('T')[0];
 
   // Bugünün rutinlerini filtrele
