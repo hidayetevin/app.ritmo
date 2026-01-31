@@ -1,3 +1,36 @@
+/* CSS Variables for Theme */
+:root {
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-color: #212529;
+    --text-muted: #6c757d;
+    --border-color: #dee2e6;
+    --header-bg: #0d6efd;
+    /* bg-primary */
+    --header-text: #ffffff;
+    --footer-bg: #ffffff;
+    --accent-color: #0d6efd;
+    --nav-active-color: #0d6efd;
+    --nav-inactive-color: #6c757d;
+    --ad-banner-bg: #f8f9fa;
+    --ad-banner-text: #212529;
+}
+
+/* Dark Mode Variables */
+body.dark-mode {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-color: #e9ecef;
+    --text-muted: #adb5bd;
+    --border-color: #2c2c2c;
+    --header-bg: #1e1e1e;
+    --header-text: #ffffff;
+    --footer-bg: #1e1e1e;
+    --nav-inactive-color: #6c757d;
+    --ad-banner-bg: #1e1e1e;
+    --ad-banner-text: #e9ecef;
+}
+
 /* Import Bootstrap */
 @import '../node_modules/bootstrap/scss/bootstrap';
 /* Import Bootstrap Icons */
@@ -7,4 +40,218 @@
 html,
 body {
     height: 100%;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Smooth transitions for common elements */
+.card,
+.modal-content,
+.nav-link,
+header,
+footer,
+.ad-banner {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Dark Mode Overrides */
+body.dark-mode {
+    .card {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-color);
+    }
+
+    .modal-content {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-color);
+    }
+
+    .form-control,
+    .form-select {
+        background-color: #2c2c2c;
+        border-color: #3d3d3d;
+        color: #e9ecef;
+
+        &:focus {
+            background-color: #333333;
+            color: #ffffff;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+    }
+
+    .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    .list-group-item {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-color);
+    }
+
+    .text-muted {
+        color: var(--text-muted) !important;
+    }
+
+    .border,
+    .border-top,
+    .border-bottom,
+    .border-start,
+    .border-end {
+        border-color: var(--border-color) !important;
+    }
+
+    // FullCalendar Dark Mode (Basic)
+    .fc {
+        color: var(--text-color);
+
+        .fc-toolbar-title {
+            color: var(--text-color);
+        }
+
+        .fc-button {
+            background-color: #2c2c2c;
+            border-color: #3d3d3d;
+
+            &:hover {
+                background-color: #3d3d3d;
+            }
+        }
+
+        td,
+        th,
+        .fc-scrollgrid {
+            border-color: var(--border-color) !important;
+        }
+
+        .fc-daygrid-day-number {
+            color: var(--text-color);
+        }
+    }
+}
+
+/* Component Based Custom Styles */
+.app-header {
+    background-color: var(--header-bg) !important;
+    color: var(--header-text) !important;
+}
+
+.ad-banner {
+    background-color: var(--ad-banner-bg) !important;
+    color: var(--ad-banner-text) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.bottom-nav {
+    background-color: var(--footer-bg) !important;
+    border-top: 1px solid var(--border-color) !important;
+}
+
+.nav-link-custom {
+    color: var(--nav-inactive-color) !important;
+
+    &.active {
+        color: var(--nav-active-color) !important;
+        font-weight: 600;
+    }
+}
+
+/* Page Layout */
+.main-body {
+    padding-bottom: 80px;
+    /* Space for fixed footer */
+}
+
+/* --- Premium Animations --- */
+
+/* Keyframes */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Animation Classes */
+.animate-fade-in-up {
+    animation: fadeInUp 0.5s ease out forwards;
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.3s ease-out forwards;
+}
+
+/* Stagger delay for lists (applied via TS or inline style) */
+.stagger-1 {
+    animation-delay: 0.1s;
+}
+
+.stagger-2 {
+    animation-delay: 0.2s;
+}
+
+.stagger-3 {
+    animation-delay: 0.3s;
+}
+
+.stagger-4 {
+    animation-delay: 0.4s;
+}
+
+/* Interactive Micro-interactions */
+.btn-shrink {
+    transition: transform 0.1s ease;
+
+    &:active {
+        transform: scale(0.95);
+    }
+}
+
+.card-hover {
+    transition: transform 0.3s transition, box-shadow 0.3s ease;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Pulse effect for active items */
+@keyframes pulse-soft {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.02);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.animate-pulse-soft {
+    animation: pulse-soft 2s infinite ease-in-out;
 }

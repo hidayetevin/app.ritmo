@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { StorageService } from '../../core/services/storage.service';
 import { DatePipe } from '@angular/common';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-home',
@@ -12,6 +13,7 @@ import { DatePipe } from '@angular/common';
 })
 export class HomeComponent {
   storage = inject(StorageService);
+  t = inject(TranslationService);
 
   today = new Date();
 

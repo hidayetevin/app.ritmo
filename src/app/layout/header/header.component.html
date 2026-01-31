@@ -1,13 +1,14 @@
-<header class="bg-primary text-white shadow-sm">
+<header class="app-header shadow-sm">
     <!-- Top Bar -->
     <div class="d-flex align-items-center p-3">
-        <i class="bi bi-calendar-check-fill fs-3 me-2"></i>
-        <h1 class="h4 mb-0 fw-bold">RutinApp</h1>
+        <i class="bi bi-calendar-check-fill fs-3 me-2 text-white" *ngIf="!isDarkMode()"></i>
+        <i class="bi bi-calendar-check-fill fs-3 me-2 text-primary" *ngIf="isDarkMode()"></i>
+        <h1 class="h4 mb-0 fw-bold">{{ t.t('APP_NAME') }}</h1>
     </div>
 
     <!-- Ad Banner Placeholder -->
-    <div class="ad-banner bg-light text-dark text-center py-2 border-bottom">
-        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">Reklam
-            Alanı</small>
+    <div class="ad-banner text-center py-2">
+        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">{{
+            t.t('REKRUM_ALANI') }}</small>
     </div>
 </header>

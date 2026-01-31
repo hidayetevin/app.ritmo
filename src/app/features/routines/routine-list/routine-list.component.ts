@@ -3,21 +3,23 @@ import { StorageService } from '../../../core/services/storage.service';
 import { Routine } from '../../../core/models/routine.model';
 import { AddRoutineModalComponent } from '../add-routine-modal/add-routine-modal.component';
 import { CommonModule } from '@angular/common';
+import { TranslationService } from '../../../core/services/translation.service';
 
 @Component({
   selector: 'app-routine-list',
   standalone: true,
-  imports: [AddRoutineModalComponent, CommonModule],
+  imports: [CommonModule, AddRoutineModalComponent],
   templateUrl: './routine-list.component.html',
   styleUrl: './routine-list.component.scss'
 })
 export class RoutineListComponent {
-  storage = inject(StorageService);
+  private storageService = inject(StorageService);
+  t = inject(TranslationService);
 
   isModalOpen = signal(false);
   editingRoutine = signal<Routine | null>(null);
 
-  routines = this.storage.routines;
+  routines = this.storageService.routines;
 
   openAddModal() {
     this.editingRoutine.set(null);
@@ -31,29 +33,27 @@ export class RoutineListComponent {
 
   saveRoutine(routineData: Partial<Routine>) {
     if (this.editingRoutine()) {
-      // Update
-      this.storage.updateRoutine({ ...this.editingRoutine()!, ...routineData } as Routine);
+      this.storageService.updateRoutine({ ...this.editingRoutine()!, ...routineData } as Routine);
     } else {
-      // Create
-      this.storage.addRoutine(routineData as any);
+      this.storageService.addRoutine(routineData as any);
     }
     this.isModalOpen.set(false);
   }
 
   deleteRoutine(id: string, event: Event) {
     event.stopPropagation();
-    if (confirm('Rutini silmek istediğine emin misin?')) {
-      this.storage.deleteRoutine(id);
+    if (confirm(this.t.t('DELETE_CONFIRM') || 'Rutini silmek istediğine emin misin?')) {
+      this.storageService.deleteRoutine(id);
     }
   }
 
   getFrequencyLabel(routine: Routine): string {
     switch (routine.frequencyType) {
-      case 'DAILY': return 'Her Gün';
-      case 'WEEKDAYS': return 'Hafta İçi';
-      case 'WEEKENDS': return 'Hafta Sonu';
-      case 'SPECIFIC_DAYS': return 'Seçili Günler';
-      case 'INTERVAL': return `${routine.intervalDays} günde bir`;
+      case 'DAILY': return this.t.t('DAILY');
+      case 'WEEKDAYS': return this.t.t('WEEKDAYS');
+      case 'WEEKENDS': return this.t.t('WEEKENDS');
+      case 'SPECIFIC_DAYS': return this.t.t('SPECIFIC_DAYS');
+      case 'INTERVAL': return `${routine.intervalDays} ${this.t.currentLang() === 'tr' ? 'günde bir' : 'days'}`;
       default: return '';
     }
   }

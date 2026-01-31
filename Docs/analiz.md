@@ -1,7 +1,7 @@
-# RutinApp - Detaylı Teknik Analiz ve Gereksinim Dökümanı
+# Ritmo - Detaylı Teknik Analiz ve Gereksinim Dökümanı
 
 ## 1. Proje Özeti
-Android platformunda çalışacak, kullanıcıların günlük, haftalık veya özel periyotlarla rutinlerini takip etmesini sağlayan, modern arayüze sahip bir "Rutin Hatırlatıcı" uygulamasıdır.
+Android platformunda çalışacak, kullanıcıların günlük, haftalık veya özel periyotlarla rutinlerini takip etmesini sağlayan, modern ve premium arayüze sahip bir "Ritim ve Rutin Hatırlatıcı" uygulamasıdır.
 
 ## 2. Teknoloji Yığını (Tech Stack)
 Uygulama, sürdürülebilirlik, performans ve UI gereksinimleri gözetilerek aşağıdaki teknolojilerle geliştirilmiştir:
@@ -12,8 +12,9 @@ Uygulama, sürdürülebilirlik, performans ve UI gereksinimleri gözetilerek aş
 *   **Mobil Paketleme:** Capacitor (Android build için) ✅
 *   **Veri Saklama:** LocalStorage (Signals ile reaktif state yönetimi) ✅
 *   **Takvim:** FullCalendar (Angular entegrasyonu) ✅
-*   **Bildirimler:** Capacitor Local Notifications Plugin ✅
+*   **Bildirimler:** Capacitor Local Notifications Plugin (Gelişmiş tekrarlama mantığı ile) ✅
 *   **Reklam:** Google AdMob (Capacitor Community AdMob Plugin) ✅
+*   **Grafikler:** Chart.js (Başarı ve istatistik takibi için) ✅
 
 ## 3. Veri Modeli (Data Structures)
 
@@ -30,8 +31,8 @@ interface Routine {
   specificDays?: number[]; // 0=Pazar, 1=Pzt... (frequencyType == SPECIFIC_DAYS ise)
   intervalDays?: number;   // Kaç günde bir? (frequencyType == INTERVAL ise)
   
-  startDate: Date;         // Başlangıç tarihi
-  endDate?: Date;          // Bitiş tarihi (Opsiyonel)
+  startDate: string;       // Başlangıç tarihi (ISO)
+  endDate?: string;        // Bitiş tarihi (Opsiyonel)
   time: string;           // Saat (HH:mm formatında)
   
   // Durum
@@ -48,145 +49,67 @@ interface UserSettings {
   isDarkMode: boolean;
   language: 'tr' | 'en';
   notificationsEnabled: boolean;
-  soundEnabled: boolean; // Uygulama içi sesler
-  vibrationEnabled: boolean; // Titreşim
+  soundEnabled: boolean;
+  vibrationEnabled: boolean;
 }
 ```
 
 ## 4. Uygulama Mimarisi ve Ekranlar
 
-### 4.1. Genel Tasarım (Layout) ✅
-*   **Header:** 
-    *   Uygulama Logosu/İsmi ("RutinApp").
-    *   **Reklam Alanı:** Header içinde placeholder (AdMob test ID ile yapılandırıldı).
-*   **Body:** Scroll edilebilir dinamik içerik alanı (Router Outlet).
-*   **Footer (Bottom Navigation Bar):**
-    *   Ana Sayfa (Home) ✅
-    *   Takvim (Calendar) ✅
-    *   Rutinlerim (Routines) ✅
-    *   Hesap (Account/Settings) ✅
+### 4.1. Genel Tasarım ve Markalama ✅
+*   **İsim:** Uygulama adı "Ritmo" olarak tescillendi.
+*   **İkon:** Özel tasarım "✓ Checkmark + Ritim Dalgaları" konseptli modern ikon.
+*   **Splash Screen:** Uygulama açılışında marka kimliğini yansıtan premium açılış ekranı.
+*   **Tema:** Açık ve Koyu (Dark) mod desteği dinamik olarak çalışır.
+*   **Animasyonlar:** Premium mikro etkileşimler (Fade-in-up, Staggered listeler, Buton küçülme efektleri).
 
-### 4.2. Ana Sayfa (Home Screen) ✅
-*   **Amaç:** Kullanıcıyı karşılamak ve uygulamanın durumunu özetlemek.
-*   **İçerik:** 
-    *   Hoş geldin mesajı ve güncel tarih.
-    *   Aktif rutin sayısı özeti.
-    *   "Yeni Rutin Ekle" hızlı aksiyon butonu.
+### 4.2. Header & Footer ✅
+*   **Header:** Uygulama ismi (Ritmo) ve reklam alanı.
+*   **Footer (Bottom Navigation Bar):** 5 Sekmeli yapı:
+    *   Ana Sayfa (Home)
+    *   Takvim (Calendar)
+    *   Başarı (Statistics) ✅ [YENİ]
+    *   Rutinler (Routines)
+    *   Hesap (Settings)
 
-### 4.3. Rutinlerim Ekranı (Routines Screen) ✅
-*   **Grid Yapısı:** 
-    *   Angular `@for` ile dönen kartlar.
-    *   Mobilde yan yana 2 kart (col-6), tablette 3-4 kart (responsive).
-*   **Rutin Kartı (Cell) Tasarımı:**
-    *   Üst kenarda rutin rengi ile border.
-    *   Başlık (kalın font, truncate).
-    *   Sıklık bilgisi (badge).
-    *   Saat bilgisi (ikon ile).
-    *   "Güncelle" yazısı ve "Sil" ikonu.
-*   **Empty State:** "Henüz rutin eklenmemiş" mesajı ve ikon.
-*   **Modal:** Kart tıklandığında düzenleme modalı açılır.
+### 4.3. Başarı Paneli (Statistics Screen) ✅ [YENİ]
+*   **Haftalık Performans:** Son 7 günün tamamlanma grafiği (Line Chart).
+*   **Rutin Dağılımı:** Kategorilere/renklere göre rutin dağılımı (Doughnut Chart).
+*   **İstatistik Kartları:** Toplam rutin ve toplam tamamlanma sayıları.
+*   **En İstikrarlı Rutin:** En çok tamamlanan rutini öne çıkaran kupa ikonlu kart.
 
-### 4.4. Rutin Ekleme/Güncelleme (Modal Component) ✅
-*   Reactive Forms ile validasyon.
-*   **Form Alanları:**
-    *   **Ad:** Text Input (zorunlu).
-    *   **Renk:** 8 renkli palet (seçilebilir butonlar).
-    *   **Sıklık Tipi:** Radio butonlar (Her Gün, Hafta İçi, Hafta Sonu, Seçili Günler, Aralıklı).
-    *   **Seçili Günler:** Pazartesi-Pazar checkbox'ları (sıklık = Specific Days ise aktif).
-    *   **Zaman:** Time picker (input type="time").
-    *   **Başlangıç Tarihi:** Date picker.
-*   **Kaydet:** Validasyon sonrası StorageService'e kaydeder.
-
-### 4.5. Takvim Ekranı (Calendar) ✅ **YENİ ÖZELLIKLER**
-Takvim ekranı **2 sekmeye** ayrıldı:
-
-#### Tab 1: Günlük Liste ✅
-*   Seçilen günün rutinlerini grid olarak gösterir.
-*   İleri/geri butonlarla tarih değişimi.
-*   **Tamamlama İşaretleme:** Kart tıklandığında o rutin "tamamlandı" olarak işaretlenir, yeşile döner.
-
-#### Tab 2: Aylık Takvim Görünümü ✅
-*   **Kütüphane:** FullCalendar.
-*   **Görünüm:** Ay görünümü.
-*   **Özellikler:**
-    *   Rutinler takvimde renklerine göre işaretlenir.
-    *   Tamamlanan rutinlerde "✔" işareti ve yeşil renk.
-    *   **Tıklanabilir:** Event üzerine tıklandığında onay penceresi ile tamamlama durumu değiştirilir.
-
-### 4.6. Ayarlar Ekranı (Settings) ✅
-*   Liste görünümü.
-*   Her satırda ayar adı ve sağda Switch (Toggle) butonu.
-*   **Ayarlar:**
-    *   Karanlık Mod (Dark Mode) - Veri kaydediliyor.
-    *   Dil Seçimi (Türkçe/İngilizce dropdown).
-    *   Bildirimler Aktif/Pasif.
-    *   Ses Aktif/Pasif.
-    *   Titreşim Aktif/Pasif.
+### 4.4. Çoklu Dil Desteği (i18n) ✅ [YENİ]
+*   **TranslationService:** Signal tabanlı reaktif dil yönetimi.
+*   **Diller:** Türkçe ve İngilizce tam destek. Ayarlar menüsünden anlık değişim.
 
 ## 5. Kritik İşlevler (Business Logic)
 
-### 5.1. Bildirim Yönetimi ✅
-*   `NotificationService` implementasyonu tamamlandı.
-*   Rutin eklendiğinde/güncellendiğinde:
-    1.  Mevcut bildirimler iptal edilir.
-    2.  Yeni bildirimler (şu an DAILY frekansı için) schedule edilir.
-*   Rutin silindiğinde: İlgili bildirimler iptal edilir.
-*   **Not:** Şu an sadece DAILY frekansı desteklenmektedir. Diğerleri için tarih hesaplaması eklenmesi gerekir.
-
-### 5.2. Veri Kalıcılığı (Persistence) ✅
-*   `StorageService` Angular Signals kullanarak reaktif state yönetimi sağlar.
-*   LocalStorage'a otomatik kaydedilir (effect ile).
-*   Uygulama açılışında veriler yüklenir.
-*   Kullanıcı değişiklikleri anında saklanır.
-
-### 5.3. Tamamlama Takibi ✅
-*   `toggleRoutineCompletion(routineId, date)` metodu ile kullanıcı rutini işaretleyebilir.
-*   Takvimde (hem liste hem aylık görünümde) görsel feedback: yeşil renk + ✔ işareti.
+### 5.1. Gelişmiş Bildirim Yönetimi ✅
+*   `NotificationService` tüm sıklık tiplerini destekler:
+    *   **Her Gün:** Günlük periyodik bildirim.
+    *   **Hafta İçi / Sonu:** Belirli gün grupları.
+    *   **Seçili Günler:** Kullanıcının seçtiği belirli günler.
+    *   **Aralıklı:** 2, 3 veya X günde bir bildirim (Sonraki 14 vaka planlanır).
 
 ## 6. Geliştirme Durumu
 
-### ✅ Tamamlananlar (Phase 1 - MVP)
-- [x] Proje kurulumu (Angular 19, Capacitor, Bootstrap)
-- [x] Core Servisler (StorageService, NotificationService)
-- [x] Layout ve Navigasyon (Header, Footer, Router)
-- [x] Ana Sayfa (Home)
-- [x] Rutinlerim Ekranı (Grid + Modal)
-- [x] Rutin Ekleme/Düzenleme Modalı (Reactive Forms + Validasyon)
-- [x] Takvim Ekranı (2 Tab: Liste + FullCalendar)
-- [x] Ayarlar Ekranı
+### ✅ Tamamlananlar (Phase 1 & 2)
+- [x] Tüm Core Servisler (Storage, Notification, Translation)
+- [x] Premium Animasyon Sistemi (CSS + Signals)
+- [x] Karanlık Mod (Dark Mode) Tam Entegrasyon
+- [x] İstatistik ve Rapor Ekranı (Chart.js)
+- [x] Uygulama İkonu ve Splash Screen Tasarımı
+- [x] Gelişmiş Bildirim Mantığı (Haftalık, Aralıklı vb.)
+- [x] Çoklu Dil Desteği (TR/EN Switcher)
 - [x] Tamamlama İşaretleme Özelliği
-- [x] LocalStorage Entegrasyonu
-- [x] Android Manifest AdMob Konfigürasyonu
-- [x] Varsayılan Angular Template Kaldırıldı
+- [x] Takvim Ekranı (2 Görünüm: Liste + Aylık)
 
-### 🚧 Devam Edenler / İyileştirmeler (Phase 2)
-- [ ] Karanlık Mod CSS implementasyonu
-- [ ] İleri seviye bildirim sıklıkları (Interval, Specific Days)
-- [ ] Dil değiştirme logic (Angular i18n)
-- [ ] İstatistik/Rapor ekranı
-- [ ] Uygulama ikonu ve Splash Screen
-- [ ] Production AdMob ID entegrasyonu
-
-## 7. Build ve Deploy
-
-### Web (Localhost Test)
-```bash
-npm start  # http://localhost:4200
-```
-
-### Android APK
-```bash
-npm run build
-npx cap sync
-npx cap open android
-# Android Studio'dan Build > Build APK
-```
-
-## 8. Notlar
-*   **Angular versiyon:** 19.2.18
-*   **Bootstrap versiyon:** 5.x
-*   **Capacitor versiyon:** 7.x
-*   **AdMob Test ID:** `ca-app-pub-3940256099942544~3347511713`
+### 🚧 Gelecek Planları (Phase 3)
+- [ ] Bulut Yedekleme (Google Drive / Firebase)
+- [ ] Rutinleri PDF olarak dışa aktarma
+- [ ] Sosyal paylaşım özelliği (Başarı grafiğini paylaş)
+- [ ] Production AdMob ID geçişi
 
 ---
-**Son Güncelleme:** 31 Ocak 2026, 20:33
+**Son Güncelleme:** 31 Ocak 2026, 21:58
+**Versiyon:** 1.1.0

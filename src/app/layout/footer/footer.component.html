@@ -1,40 +1,36 @@
-<nav class="navbar fixed-bottom navbar-light bg-light border-top shadow-lg">
+<nav class="navbar fixed-bottom bottom-nav shadow-lg">
     <div class="container-fluid d-flex justify-content-around">
 
         <a routerLink="/home" routerLinkActive="active"
-            class="btn btn-link text-decoration-none text-dark d-flex flex-column align-items-center">
+            class="btn btn-link text-decoration-none nav-link-custom d-flex flex-column align-items-center">
             <i class="bi bi-house fs-4"></i>
-            <span class="small">Ana Sayfa</span>
+            <span class="small" style="font-size: 0.65rem;">{{ t.t('HOME') }}</span>
         </a>
 
         <a routerLink="/calendar" routerLinkActive="active"
-            class="btn btn-link text-decoration-none text-dark d-flex flex-column align-items-center">
+            class="btn btn-link text-decoration-none nav-link-custom d-flex flex-column align-items-center">
             <i class="bi bi-calendar-event fs-4"></i>
-            <span class="small">Takvim</span>
+            <span class="small" style="font-size: 0.65rem;">{{ t.t('CALENDAR') }}</span>
+        </a>
+
+        <!-- Statistics Tab -->
+        <a routerLink="/statistics" routerLinkActive="active"
+            class="btn btn-link text-decoration-none nav-link-custom d-flex flex-column align-items-center">
+            <i class="bi bi-bar-chart-fill fs-4 text-primary" style="opacity: 0.8;"></i>
+            <span class="small" style="font-size: 0.65rem;">{{ t.t('STATISTICS') }}</span>
         </a>
 
         <a routerLink="/routines" routerLinkActive="active"
-            class="btn btn-link text-decoration-none text-dark d-flex flex-column align-items-center">
+            class="btn btn-link text-decoration-none nav-link-custom d-flex flex-column align-items-center">
             <i class="bi bi-list-check fs-4"></i>
-            <span class="small">Rutinler</span>
+            <span class="small" style="font-size: 0.65rem;">{{ t.t('ROUTINES') }}</span>
         </a>
 
         <a routerLink="/settings" routerLinkActive="active"
-            class="btn btn-link text-decoration-none text-dark d-flex flex-column align-items-center">
+            class="btn btn-link text-decoration-none nav-link-custom d-flex flex-column align-items-center">
             <i class="bi bi-person-gear fs-4"></i>
-            <span class="small">Hesap</span>
+            <span class="small" style="font-size: 0.65rem;">{{ t.t('SETTINGS') }}</span>
         </a>
 
     </div>
 </nav>
-
-<style>
-    .active {
-        color: var(--bs-primary) !important;
-        font-weight: bold;
-    }
-
-    .active i {
-        color: var(--bs-primary) !important;
-    }
-</style>

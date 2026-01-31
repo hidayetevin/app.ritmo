@@ -1,35 +1,35 @@
 <div class="container py-4">
     <!-- Welcome Section -->
-    <div class="card border-0 shadow-sm bg-primary text-white mb-4">
+    <div class="card border-0 shadow-sm bg-primary text-white mb-4 animate-fade-in-up">
         <div class="card-body p-4">
-            <h5 class="card-title fw-light">Hoş Geldin!</h5>
-            <p class="display-6 fw-bold mb-0">{{ today | date:'EEEE, d MMMM' }}</p>
+            <h5 class="card-title fw-light">{{ t.t('WELCOME') }}</h5>
+            <p class="display-6 fw-bold mb-0 text-capitalize">{{ today | date:'EEEE, d MMMM' }}</p>
             <p class="mt-2 mb-0 opacity-75">
                 Bugün takip etmen gereken
-                <span class="fw-bold text-decoration-underline">{{ activeRoutinesCount }}</span> rutin var.
+                <span class="fw-bold text-decoration-underline">{{ activeRoutinesCount() }}</span> rutin var.
             </p>
         </div>
     </div>
 
     <!-- Quick Actions -->
-    <div class="d-grid gap-3">
+    <div class="d-grid gap-3 stagger-1 animate-fade-in-up">
         <button routerLink="/routines"
-            class="btn btn-lg btn-outline-primary d-flex align-items-center justify-content-center p-4 rounded-3 shadow-sm border-2 border-dashed">
-            <i class="bi bi-plus-circle-fill fs-1 me-3 text-primary"></i>
+            class="btn btn-lg btn-outline-primary d-flex align-items-center justify-content-center p-4 rounded-3 shadow-sm border-2 border-dashed btn-shrink card-hover">
+            <i class="bi bi-plus-circle-fill fs-1 me-3 text-primary animate-pulse-soft"></i>
             <div class="text-start">
-                <div class="fw-bold">Yeni Rutin Ekle</div>
+                <div class="fw-bold">{{ t.t('ADD_ROUTINE') }}</div>
                 <small class="text-muted">Kişisel hedeflerin için bir adım at</small>
             </div>
         </button>
     </div>
 
     <!-- Tips Section (Static for now) -->
-    <div class="mt-4">
+    <div class="mt-4 stagger-2 animate-fade-in-up">
         <h6 class="text-muted text-uppercase small fw-bold mb-3">Günün İpucu</h6>
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 shadow-sm card-hover">
             <div class="card-body">
                 <div class="d-flex">
-                    <i class="bi bi-lightbulb-fill text-warning fs-3 me-3"></i>
+                    <i class="bi bi-lightbulb-fill text-warning fs-3 me-3 animate-pulse-soft"></i>
                     <div>
                         <p class="mb-0 fw-medium">Küçük Adımlar</p>
                         <small class="text-muted">Büyük değişimler, her gün yapılan küçük rutinlerle başlar.</small>
@@ -43,5 +43,10 @@
 <style>
     .border-dashed {
         border-style: dashed !important;
+    }
+
+    .animate-fade-in-up {
+        animation-fill-mode: forwards;
+        opacity: 0;
     }
 </style>

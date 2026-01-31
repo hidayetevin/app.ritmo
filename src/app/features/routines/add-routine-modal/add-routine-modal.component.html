@@ -1,29 +1,30 @@
-<div class="modal d-block" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+<div class="modal d-block animate-fade-in" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered modal-lg animate-scale-in" role="document">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-light">
-                <h5 class="modal-title fw-bold text-primary">{{ routineToEdit ? 'Rutin Güncelle' : 'Yeni Rutin Ekle' }}
+                <h5 class="modal-title fw-bold text-primary">{{ routineToEdit ? t.t('EDIT_ROUTINE') : t.t('ADD_ROUTINE')
+                    }}
                 </h5>
-                <button type="button" class="btn-close" aria-label="Close" (click)="cancel.emit()"></button>
+                <button type="button" class="btn-close btn-shrink" aria-label="Close" (click)="cancel.emit()"></button>
             </div>
 
             <div class="modal-body p-4">
                 <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
                     <!-- Title -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small text-muted">Rutin Adı</label>
+                    <div class="mb-3 animate-fade-in-up stagger-1">
+                        <label class="form-label fw-bold small text-muted">{{ t.t('TITLE') }}</label>
                         <input type="text" class="form-control form-control-lg fw-bold" formControlName="title"
                             placeholder="Örn: Su İç, Kitap Oku...">
                     </div>
 
                     <div class="row">
                         <!-- Color -->
-                        <div class="col-md-12 mb-4">
-                            <label class="form-label fw-bold small text-muted d-block">Renk Seç</label>
+                        <div class="col-md-12 mb-4 animate-fade-in-up stagger-2">
+                            <label class="form-label fw-bold small text-muted d-block">{{ t.t('COLOR') }}</label>
                             <div class="d-flex flex-wrap gap-2">
                                 @for (c of colors; track c) {
-                                <div class="color-circle" [style.background-color]="c"
+                                <div class="color-circle btn-shrink" [style.background-color]="c"
                                     [class.selected]="form.get('color')?.value === c"
                                     (click)="form.patchValue({color: c})">
                                     @if(form.get('color')?.value === c) {
@@ -35,8 +36,8 @@
                         </div>
 
                         <!-- Frequency -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold small text-muted">Sıklık</label>
+                        <div class="col-md-6 mb-3 animate-fade-in-up stagger-3">
+                            <label class="form-label fw-bold small text-muted">{{ t.t('FREQUENCY') }}</label>
                             <select class="form-select" formControlName="frequencyType">
                                 @for (f of frequencies; track f) {
                                 <option [value]="f.value">{{ f.label }}</option>
@@ -45,19 +46,19 @@
                         </div>
 
                         <!-- Time -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold small text-muted">Saat</label>
+                        <div class="col-md-6 mb-3 animate-fade-in-up stagger-4">
+                            <label class="form-label fw-bold small text-muted">{{ t.t('TIME') }}</label>
                             <input type="time" class="form-control" formControlName="time">
                         </div>
                     </div>
 
                     <!-- Specific Days -->
                     @if (form.get('frequencyType')?.value === 'SPECIFIC_DAYS') {
-                    <div class="mb-3 p-3 bg-light rounded">
+                    <div class="mb-3 p-3 bg-light rounded animate-scale-in">
                         <label class="d-block small fw-bold text-muted mb-2">Günler</label>
                         <div class="btn-group w-100" role="group">
                             @for (day of days; track day) {
-                            <button type="button" class="btn btn-sm"
+                            <button type="button" class="btn btn-sm btn-shrink"
                                 [class.btn-primary]="form.value.specificDays?.includes(day.index)"
                                 [class.btn-outline-secondary]="!form.value.specificDays?.includes(day.index)"
                                 (click)="toggleDay(day.index)">
@@ -70,7 +71,7 @@
 
                     <!-- Interval -->
                     @if (form.get('frequencyType')?.value === 'INTERVAL') {
-                    <div class="mb-3 p-3 bg-light rounded">
+                    <div class="mb-3 p-3 bg-light rounded animate-scale-in">
                         <label class="form-label fw-bold small text-muted">Kaç günde bir?</label>
                         <div class="input-group">
                             <input type="number" class="form-control" formControlName="intervalDays" min="2">
@@ -80,14 +81,16 @@
                     }
 
                     <!-- Start Date -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold small text-muted">Başlangıç Tarihi</label>
+                    <div class="mb-4 animate-fade-in-up stagger-4">
+                        <label class="form-label fw-bold small text-muted">{{ t.t('START_DATE') }}</label>
                         <input type="date" class="form-control" formControlName="startDate">
                     </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="button" class="btn btn-light me-md-2" (click)="cancel.emit()">İptal</button>
-                        <button type="submit" class="btn btn-primary px-4" [disabled]="form.invalid">Kaydet</button>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end animate-fade-in-up stagger-4">
+                        <button type="button" class="btn btn-light me-md-2 btn-shrink" (click)="cancel.emit()">{{
+                            t.t('CANCEL') }}</button>
+                        <button type="submit" class="btn btn-primary px-4 shadow btn-shrink"
+                            [disabled]="form.invalid">{{ t.t('SAVE') }}</button>
                     </div>
                 </form>
             </div>
@@ -108,12 +111,29 @@
         transition: transform 0.2s;
     }
 
-    .color-circle:hover {
-        transform: scale(1.1);
-    }
-
     .color-circle.selected {
         border-color: #333;
         transform: scale(1.1);
+        box-shadow: 0 0 0 2px white, 0 0 0 4px var(--bs-primary);
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .animate-fade-in-up,
+    .animate-scale-in {
+        opacity: 0;
+        animation-fill-mode: forwards;
     }
 </style>

@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Routine, FrequencyType } from '../../../core/models/routine.model';
 import { CommonModule } from '@angular/common';
+import { TranslationService } from '../../../core/services/translation.service';
 
 @Component({
   selector: 'app-add-routine-modal',
@@ -16,14 +17,15 @@ export class AddRoutineModalComponent implements OnInit {
   @Output() cancel = new EventEmitter<void>();
 
   fb = inject(FormBuilder);
+  t = inject(TranslationService);
   form!: FormGroup;
 
   frequencies: { value: FrequencyType, label: string }[] = [
-    { value: 'DAILY', label: 'Her Gün' },
-    { value: 'WEEKDAYS', label: 'Hafta İçi' },
-    { value: 'WEEKENDS', label: 'Hafta Sonu' },
-    { value: 'SPECIFIC_DAYS', label: 'Seçili Günler' },
-    { value: 'INTERVAL', label: 'Belirli Aralıkla' }
+    { value: 'DAILY', label: this.t.t('DAILY') },
+    { value: 'WEEKDAYS', label: this.t.t('WEEKDAYS') },
+    { value: 'WEEKENDS', label: this.t.t('WEEKENDS') },
+    { value: 'SPECIFIC_DAYS', label: this.t.t('SPECIFIC_DAYS') },
+    { value: 'INTERVAL', label: this.t.t('INTERVAL') }
   ];
 
   colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A1', '#33FFF6', '#FFC300', '#DAF7A6'];
@@ -38,7 +40,7 @@ export class AddRoutineModalComponent implements OnInit {
     if (this.routineToEdit) {
       this.form.patchValue({
         ...this.routineToEdit,
-        startDate: this.routineToEdit.startDate.split('T')[0] // Ensure date format
+        startDate: this.routineToEdit.startDate.split('T')[0]
       });
     }
   }
