@@ -5,7 +5,8 @@ import {
     BannerAdSize,
     BannerAdPosition,
     RewardAdOptions,
-    AdMobError
+    RewardAdPluginEvents,
+    AdLoadInfo
 } from '@capacitor-community/admob';
 
 @Injectable({
@@ -16,31 +17,84 @@ export class AdService {
     private rewardedId = 'ca-app-pub-4190858087915294/9976663290';
 
     private transitionCount = 0;
-    private isRewardedAdLoaded = false;
+    private isRewardedAdReady = false;
+    private isPreloading = false;
 
     constructor() {
+        this.setupListeners();
         this.initialize();
     }
 
-    async initialize() {
-        await AdMob.initialize({});
-        // Uygulama açılır açılmaz ilk reklamı arka planda yükle
-        this.preloadRewardedAd();
+    // Dinleyicileri kur: Reklam yüklendiğinde veya kapandığında ne yapacağını bilir.
+    private setupListeners() {
+        // Reklam başarıyla yüklendiğinde
+        AdMob.addListener(RewardAdPluginEvents.Loaded, (info: AdLoadInfo) => {
+            console.log('✅ Ödüllü Reklam Hafızaya Alındı:', info);
+            this.isRewardedAdReady = true;
+            this.isPreloading = false;
+        });
+
+        // Reklam kapatıldığında veya ödül alındığında
+        AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
+            console.log('🔄 Reklam kapatıldı, yenisi çekiliyor...');
+            this.isRewardedAdReady = false;
+            this.preloadRewardedAd(); // Hemen yenisini çek
+        });
+
+        // Reklam yükleme hatası aldığında
+        AdMob.addListener(RewardAdPluginEvents.FailedToLoad, (error) => {
+            console.error('❌ Reklam yüklenemedi:', error);
+            this.isRewardedAdReady = false;
+            this.isPreloading = false;
+            // 10 saniye sonra tekrar dene
+            setTimeout(() => this.preloadRewardedAd(), 10000);
+        });
     }
 
-    // Reklamı arka planda hazırlayan fonksiyon
+    async initialize() {
+        try {
+            await AdMob.initialize({});
+            this.preloadRewardedAd();
+        } catch (e) {
+            console.error('AdMob init error:', e);
+        }
+    }
+
     async preloadRewardedAd() {
+        if (this.isRewardedAdReady || this.isPreloading) return;
+
+        this.isPreloading = true;
         try {
             const options: RewardAdOptions = {
                 adId: this.rewardedId,
                 isTesting: false
             };
+            // Sadece 'prepare' diyoruz, 'show' demiyoruz. 
+            // Arka planda indirme başlar.
             await AdMob.prepareRewardVideoAd(options);
-            this.isRewardedAdLoaded = true;
-            console.log('Rewarded ad preloaded and ready.');
         } catch (error) {
-            console.error('Failed to preload rewarded ad:', error);
-            this.isRewardedAdLoaded = false;
+            this.isPreloading = false;
+            console.error('Preload call failed:', error);
+        }
+    }
+
+    async showRewardedAd() {
+        // Eğer reklam hazırsa saniyesinde gösterilir.
+        if (this.isRewardedAdReady) {
+            try {
+                const reward = await AdMob.showRewardVideoAd();
+                return reward;
+            } catch (e) {
+                console.error('Show failed:', e);
+                this.preloadRewardedAd();
+                return null;
+            }
+        } else {
+            // Reklam hazır değilse (yükleniyorsa veya internet yoksa)
+            // Kullanıcıyı bekletmemek için hemen normal akışa dönüyoruz.
+            console.log('⚠️ Reklam henüz hazır değil, akış devam ediyor...');
+            if (!this.isPreloading) this.preloadRewardedAd();
+            return null;
         }
     }
 
@@ -48,42 +102,11 @@ export class AdService {
         const options: BannerAdOptions = {
             adId: this.bannerId,
             adSize: BannerAdSize.ADAPTIVE_BANNER,
-            position: BannerAdPosition.TOP_CENTER,
-            margin: 0,
+            position: BannerAdPosition.BOTTOM_CENTER,
+            margin: 60, // Navigasyonun üzerine oturması için
             isTesting: false
         };
         await AdMob.showBanner(options);
-    }
-
-    async hideBanner() {
-        await AdMob.removeBanner();
-    }
-
-    async showRewardedAd() {
-        try {
-            // Eğer önceden yüklendiyse direkt göster (Anında açılır)
-            if (this.isRewardedAdLoaded) {
-                const reward = await AdMob.showRewardVideoAd();
-                this.isRewardedAdLoaded = false;
-                this.preloadRewardedAd(); // Bir sonraki kullanım için hemen yenisini yükle
-                return reward;
-            } else {
-                // Yüklenmemişse (nadiren olur), hızlıca yükleyip göstermeyi dene
-                console.log('Ad not preloaded, loading now...');
-                const options: RewardAdOptions = {
-                    adId: this.rewardedId,
-                    isTesting: false
-                };
-                await AdMob.prepareRewardVideoAd(options);
-                const reward = await AdMob.showRewardVideoAd();
-                this.preloadRewardedAd();
-                return reward;
-            }
-        } catch (error) {
-            console.error('Rewarded ad show error:', error);
-            this.preloadRewardedAd(); // Hata olsa bile bir sonrakini yüklemeye çalış
-            return null;
-        }
     }
 
     handleMenuTransition() {
