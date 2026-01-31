@@ -111,7 +111,7 @@ export class AdService {
 
     handleMenuTransition() {
         this.transitionCount++;
-        if (this.transitionCount % 3 === 0) {
+        if (this.transitionCount % 5 === 0) {
             this.showRewardedAd();
         }
     }
