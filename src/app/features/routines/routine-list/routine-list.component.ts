@@ -1,10 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { StorageService } from '../../../core/services/storage.service';
 import { Routine } from '../../../core/models/routine.model';
 import { AddRoutineModalComponent } from '../add-routine-modal/add-routine-modal.component';
 import { CommonModule } from '@angular/common';
 import { TranslationService } from '../../../core/services/translation.service';
 import { AdService } from '../../../core/services/ad.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-routine-list',
@@ -13,15 +14,36 @@ import { AdService } from '../../../core/services/ad.service';
   templateUrl: './routine-list.component.html',
   styleUrl: './routine-list.component.scss'
 })
-export class RoutineListComponent {
+export class RoutineListComponent implements OnInit {
   private storageService = inject(StorageService);
   private adService = inject(AdService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
   t = inject(TranslationService);
 
   isModalOpen = signal(false);
   editingRoutine = signal<Routine | null>(null);
 
   routines = this.storageService.routines;
+
+  ngOnInit() {
+    // Check if we need to open add modal automatically
+    this.route.queryParams.subscribe(params => {
+      if (params['add'] === 'true') {
+        // Clear params without reloading
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { add: null },
+          queryParamsHandling: 'merge',
+          replaceUrl: true
+        });
+
+        // Open modal directly (user already watched ad on home page)
+        this.editingRoutine.set(null);
+        this.isModalOpen.set(true);
+      }
+    });
+  }
 
   openAddModal() {
     this.adService.showRewardedAd().finally(() => {

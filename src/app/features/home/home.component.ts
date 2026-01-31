@@ -24,7 +24,7 @@ export class HomeComponent {
 
   goToAdd() {
     this.adService.showRewardedAd().finally(() => {
-      this.router.navigate(['/routines']);
+      this.router.navigate(['/routines'], { queryParams: { add: 'true' } });
     });
   }
   todayIso = this.today.toISOString().split('T')[0];

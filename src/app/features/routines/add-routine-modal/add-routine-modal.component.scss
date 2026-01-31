@@ -1,0 +1,33 @@
+/* Color Selection Styles */
+.color-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid transparent;
+    transition: transform 0.2s;
+
+    &.selected {
+        border-color: #333;
+        transform: scale(1.1);
+        box-shadow: 0 0 0 2px white, 0 0 0 4px var(--bs-primary);
+    }
+}
+
+/* Modal Animations (Without forced opacity) */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
