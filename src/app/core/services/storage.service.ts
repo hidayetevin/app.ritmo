@@ -85,14 +85,18 @@ export class StorageService {
         );
 
         // Refresh Notification
-        this.notificationService.cancelRoutine(updatedRoutine.id).then(() => {
-            this.notificationService.scheduleRoutine(updatedRoutine);
-        });
+        // cancelRoutine artık nesne bekliyor
+        this.notificationService.scheduleRoutine(updatedRoutine);
     }
 
     deleteRoutine(id: string) {
+        const routineToDelete = this.routinesSignal().find(r => r.id === id);
+
+        if (routineToDelete) {
+            this.notificationService.cancelRoutine(routineToDelete);
+        }
+
         this.routinesSignal.update(list => list.filter(r => r.id !== id));
-        this.notificationService.cancelRoutine(id);
     }
 
     toggleRoutineCompletion(routineId: string, date: string) { // Date in ISO string YYYY-MM-DD

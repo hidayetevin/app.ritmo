@@ -99,14 +99,26 @@ export class AdService {
     }
 
     async showBanner() {
-        const options: BannerAdOptions = {
-            adId: this.bannerId,
-            adSize: BannerAdSize.BANNER, // Standart 50px yükseklik (daha tahmin edilebilir)
-            position: BannerAdPosition.BOTTOM_CENTER,
-            margin: 120, // Navigasyonun çok daha üzerine (garanti payı ile)
-            isTesting: false
-        };
-        await AdMob.showBanner(options);
+        try {
+            const options: BannerAdOptions = {
+                adId: this.bannerId,
+                adSize: BannerAdSize.ADAPTIVE_BANNER,
+                position: BannerAdPosition.TOP_CENTER,
+                margin: 56, // Header'ın altında
+                isTesting: false
+            };
+            await AdMob.showBanner(options);
+        } catch (e) {
+            console.error('Show banner error:', e);
+        }
+    }
+
+    async hideBanner() {
+        try {
+            await AdMob.removeBanner();
+        } catch (e) {
+            console.error('Hide banner error:', e);
+        }
     }
 
     handleMenuTransition() {

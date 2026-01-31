@@ -1,8 +1,9 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, OnInit, OnDestroy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { StorageService } from '../../core/services/storage.service';
 import { TranslationService } from '../../core/services/translation.service';
 import { AdService } from '../../core/services/ad.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { Router } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Routine } from '../../core/models/routine.model';
@@ -14,11 +15,21 @@ import { Routine } from '../../core/models/routine.model';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit, OnDestroy {
   storage = inject(StorageService);
   t = inject(TranslationService);
   private adService = inject(AdService);
+  private notifService = inject(NotificationService);
   private router = inject(Router);
+
+  ngOnInit() {
+    this.adService.showBanner();
+    this.notifService.requestPermissions();
+  }
+
+  ngOnDestroy() {
+    this.adService.hideBanner();
+  }
 
   today = new Date();
 

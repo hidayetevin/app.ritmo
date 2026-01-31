@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { LocalNotifications, ScheduleOptions, PendingResult } from '@capacitor/local-notifications';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import { Routine } from '../models/routine.model';
 
 @Injectable({
@@ -7,162 +7,139 @@ import { Routine } from '../models/routine.model';
 })
 export class NotificationService {
 
-    constructor() {
-        this.requestPermissions();
-    }
+    constructor() { }
 
     async requestPermissions() {
-        try {
-            const permission = await LocalNotifications.checkPermissions();
-            if (permission.display !== 'granted') {
-                await LocalNotifications.requestPermissions();
-            }
-        } catch (e) {
-            console.warn('Notification permissions lookup failed', e);
+        const perm = await LocalNotifications.requestPermissions();
+        return perm.display === 'granted';
+    }
+
+    // String ID'den (UUID) Integer ID üretir (Hash)
+    private getNotificationId(routineId: string, offset: number = 0): number {
+        let hash = 0;
+        for (let i = 0; i < routineId.length; i++) {
+            const char = routineId.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
         }
+        // Negatifleri pozitife çevir ve offset ekle (aynı rutinin farklı günleri için)
+        return Math.abs(hash) + offset;
     }
 
     async scheduleRoutine(routine: Routine) {
+        // Önce bu rutine ait eski bildirimleri temizle
+        await this.cancelRoutine(routine);
+
         if (!routine.isActive) return;
 
-        // Clean up any existing notifications for this routine first
-        await this.cancelRoutine(routine.id);
-
-        const [hours, mins] = routine.time.split(':').map(Number);
-        const baseId = this.hashCode(routine.id);
         const notifications: any[] = [];
+        const [hours, mins] = routine.time.split(':').map(Number);
+
+        // Temel bildirim şablonu
+        const baseObj = {
+            title: 'Rutin Zamanı! 🔔',
+            body: `Hadi, "${routine.title}" rutinini yapma zamanı.`,
+            sound: 'beep.wav', // Varsayılan ses
+            schedule: {
+                allowWhileIdle: true // Doze modunda bile çalsın
+            }
+        };
 
         switch (routine.frequencyType) {
             case 'DAILY':
+                // Her gün tekrarla
                 notifications.push({
-                    id: baseId,
-                    title: 'Ritmo Hatırlatıcı',
-                    body: `${routine.title} zamanı geldi!`,
-                    schedule: {
-                        on: { hour: hours, minute: mins },
-                        allowWhileIdle: true,
-                        repeats: true
-                    }
+                    id: this.getNotificationId(routine.id),
+                    ...baseObj,
+                    schedule: { on: { hour: hours, minute: mins }, allowWhileIdle: true }
                 });
                 break;
 
-            case 'WEEKDAYS': // Mon - Fri (2 - 6 in Capacitor)
-                for (let i = 2; i <= 6; i++) {
+            case 'WEEKDAYS':
+                // Pzt(2) - Cuma(6) arası 5 adet haftalık bildirim
+                for (let day = 2; day <= 6; day++) {
                     notifications.push({
-                        id: baseId + i,
-                        title: 'Ritmo Hatırlatıcı',
-                        body: `${routine.title} zamanı geldi!`,
-                        schedule: {
-                            on: { weekday: i, hour: hours, minute: mins },
-                            allowWhileIdle: true,
-                            repeats: true
-                        }
+                        id: this.getNotificationId(routine.id, day),
+                        ...baseObj,
+                        schedule: { on: { weekday: day, hour: hours, minute: mins }, allowWhileIdle: true }
                     });
                 }
                 break;
 
-            case 'WEEKENDS': // Sat, Sun (7, 1 in Capacitor)
-                [1, 7].forEach(day => {
+            case 'WEEKENDS':
+                // Cumartesi(7) ve Pazar(1)
+                [7, 1].forEach(day => {
                     notifications.push({
-                        id: baseId + day,
-                        title: 'Ritmo Hatırlatıcı',
-                        body: `${routine.title} zamanı geldi!`,
-                        schedule: {
-                            on: { weekday: day, hour: hours, minute: mins },
-                            allowWhileIdle: true,
-                            repeats: true
-                        }
+                        id: this.getNotificationId(routine.id, day),
+                        ...baseObj,
+                        schedule: { on: { weekday: day, hour: hours, minute: mins }, allowWhileIdle: true }
                     });
                 });
                 break;
 
-            case 'SPECIFIC_DAYS': // 0=Sun (1), 1=Mon (2)...
-                if (routine.specificDays) {
-                    routine.specificDays.forEach(day => {
-                        const capacitorDay = day === 0 ? 1 : day + 1;
-                        notifications.push({
-                            id: baseId + capacitorDay,
-                            title: 'Ritmo Hatırlatıcı',
-                            body: `${routine.title} zamanı geldi!`,
-                            schedule: {
-                                on: { weekday: capacitorDay, hour: hours, minute: mins },
-                                allowWhileIdle: true,
-                                repeats: true
-                            }
-                        });
+            case 'SPECIFIC_DAYS':
+                // Seçilen günler (0=Pazar -> Capacitor 1=Pazar. Dönüşüm: day + 1)
+                (routine.specificDays || []).forEach(dayIndex => {
+                    const capDay = dayIndex + 1; // JS(0-6) -> Capacitor(1-7)
+                    notifications.push({
+                        id: this.getNotificationId(routine.id, capDay),
+                        ...baseObj,
+                        schedule: { on: { weekday: capDay, hour: hours, minute: mins }, allowWhileIdle: true }
                     });
-                }
+                });
                 break;
 
             case 'INTERVAL':
-                // For Interval (e.g., every 3 days), we schedule the next 14 occurrences
+                if (!routine.intervalDays) break;
+                // Önümüzdeki 60 gün için tek tek hesapla
+                const today = new Date();
                 const startDate = new Date(routine.startDate);
-                startDate.setHours(hours, mins, 0, 0);
+                const calcDate = new Date(startDate);
 
-                const interval = routine.intervalDays || 2;
+                // Başlangıç tarihi geçmişteyse bugüne en yakın gelecek tarihi bul
+                if (calcDate < today) {
+                    const diffTime = today.getTime() - startDate.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    const remainder = diffDays % routine.intervalDays;
+                    const daysToAdd = remainder === 0 ? 0 : (routine.intervalDays - remainder);
+                    calcDate.setDate(today.getDate() + daysToAdd);
+                }
 
-                for (let i = 0; i < 14; i++) {
-                    const scheduledDate = new Date(startDate);
-                    scheduledDate.setDate(startDate.getDate() + (i * interval));
+                // 60 gün ileriye kadar (veya 30 kullanım) planla
+                for (let i = 0; i < 30; i++) {
+                    calcDate.setHours(hours, mins, 0, 0);
 
-                    if (scheduledDate > new Date()) {
-                        notifications.push({
-                            id: baseId + 100 + i,
-                            title: 'Ritmo Hatırlatıcı',
-                            body: `${routine.title} zamanı geldi!`,
-                            schedule: {
-                                at: scheduledDate,
-                                allowWhileIdle: true
-                            }
-                        });
-                    }
+                    if (routine.endDate && calcDate > new Date(routine.endDate)) break;
+
+                    notifications.push({
+                        id: this.getNotificationId(routine.id, i),
+                        ...baseObj,
+                        schedule: { at: new Date(calcDate), allowWhileIdle: true }
+                    });
+
+                    // Bir sonraki tarih
+                    calcDate.setDate(calcDate.getDate() + routine.intervalDays);
                 }
                 break;
         }
 
         if (notifications.length > 0) {
-            try {
-                await LocalNotifications.schedule({ notifications });
-            } catch (e) {
-                console.error('Failed to schedule advanced notifications', e);
-            }
+            await LocalNotifications.schedule({ notifications });
+            console.log(`🔔 ${notifications.length} bildirim planlandı: ${routine.title}`);
         }
     }
 
-    async cancelRoutine(routineId: string) {
-        const baseId = this.hashCode(routineId);
-
-        // Identify notifications to cancel
-        // Since we don't have a list of active IDs specifically stored, 
-        // we cancel the range of possible IDs we use for this routine.
-        const idsToCancel = [
-            baseId, // DAILY
-            baseId + 1, baseId + 2, baseId + 3, baseId + 4, baseId + 5, baseId + 6, baseId + 7, // Weekdays/ends
-        ];
-
-        // Add interval IDs
-        for (let i = 0; i < 14; i++) {
-            idsToCancel.push(baseId + 100 + i);
+    async cancelRoutine(routine: Routine) {
+        // Olası tüm ID'leri iptal et (Max 50 varsayımı)
+        const ids = [];
+        for (let i = 0; i < 50; i++) {
+            ids.push({ id: this.getNotificationId(routine.id, i) });
+        }
+        // Ekstra: Hafta günleri için de (1-7)
+        for (let i = 1; i <= 7; i++) {
+            ids.push({ id: this.getNotificationId(routine.id, i) });
         }
 
-        try {
-            await LocalNotifications.cancel({
-                notifications: idsToCancel.map(id => ({ id }))
-            });
-        } catch (e) {
-            console.warn('Failed to cancel notifications', e);
-        }
-    }
-
-    private hashCode(str: string): number {
-        let hash = 0;
-        if (str.length === 0) return hash;
-        for (let i = 0; i < str.length; i++) {
-            const chr = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + chr;
-            hash |= 0;
-        }
-        // Multiply by 1000 to leave room for indexed sub-identifers
-        return Math.abs(hash % 1000000) * 10;
+        await LocalNotifications.cancel({ notifications: ids });
     }
 }
