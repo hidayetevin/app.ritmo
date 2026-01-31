@@ -5,14 +5,57 @@
             <h5 class="card-title fw-light">{{ t.t('WELCOME') }}</h5>
             <p class="display-6 fw-bold mb-0 text-capitalize">{{ today | date:'EEEE, d MMMM' }}</p>
             <p class="mt-2 mb-0 opacity-75">
-                Bugün takip etmen gereken
-                <span class="fw-bold text-decoration-underline">{{ activeRoutinesCount }}</span> rutin var.
+                Bugün <span class="fw-bold">{{ completedCount }} / {{ activeRoutinesCount }}</span> rutin tamamlandı.
             </p>
+            <div class="progress mt-3 bg-white bg-opacity-25" style="height: 6px;">
+                <div class="progress-bar bg-white" role="progressbar"
+                    [style.width]="(completedCount / (activeRoutinesCount || 1) * 100) + '%'"></div>
+            </div>
         </div>
     </div>
 
+    <!-- Today's List -->
+    <div class="mb-4 animate-fade-in-up stagger-1">
+        <h6 class="text-muted text-uppercase small fw-bold mb-3">Bugün Ne Var?</h6>
+
+        @if (todaysRoutines().length > 0) {
+        <div class="d-flex flex-column gap-2">
+            @for (routine of todaysRoutines(); track routine.id; let idx = $index) {
+            <div class="card border-0 shadow-sm animate-scale-in" [style.animation-delay]="(idx * 0.1) + 's'"
+                [class.opacity-75]="isCompleted(routine)">
+                <div class="card-body py-3 d-flex align-items-center" (click)="toggleComplete(routine)">
+                    <!-- Status Circle -->
+                    <div class="me-3 rounded-circle d-flex align-items-center justify-content-center btn-shrink"
+                        [style.width]="'40px'" [style.height]="'40px'"
+                        [style.background-color]="isCompleted(routine) ? '#198754' : routine.color + '20'"
+                        [style.color]="isCompleted(routine) ? 'white' : routine.color">
+                        <i class="bi" [class.bi-check-lg]="isCompleted(routine)"
+                            [class.bi-circle]="!isCompleted(routine)"></i>
+                    </div>
+
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0 fw-bold" [class.text-decoration-line-through]="isCompleted(routine)">{{
+                            routine.title }}</h6>
+                        <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ routine.time }}</small>
+                    </div>
+
+                    @if (isCompleted(routine)) {
+                    <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">BİTTİ</span>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+        } @else {
+        <div class="card border-0 shadow-sm bg-light py-4 text-center">
+            <i class="bi bi-emoji-smile fs-2 text-muted mb-2"></i>
+            <p class="text-muted small mb-0">Harika! Bugün için planlanan tüm işlerini bitirdin.</p>
+        </div>
+        }
+    </div>
+
     <!-- Quick Actions -->
-    <div class="d-grid gap-3 stagger-1 animate-fade-in-up">
+    <div class="d-grid gap-3 stagger-2 animate-fade-in-up">
         <button routerLink="/routines"
             class="btn btn-lg btn-outline-primary d-flex align-items-center justify-content-center p-4 rounded-3 shadow-sm border-2 border-dashed btn-shrink card-hover">
             <i class="bi bi-plus-circle-fill fs-1 me-3 text-primary animate-pulse-soft"></i>
@@ -23,8 +66,8 @@
         </button>
     </div>
 
-    <!-- Tips Section (Static for now) -->
-    <div class="mt-4 stagger-2 animate-fade-in-up">
+    <!-- Tips Section -->
+    <div class="mt-4 stagger-3 animate-fade-in-up">
         <h6 class="text-muted text-uppercase small fw-bold mb-3">Günün İpucu</h6>
         <div class="card border-0 shadow-sm card-hover">
             <div class="card-body">
@@ -45,7 +88,8 @@
         border-style: dashed !important;
     }
 
-    .animate-fade-in-up {
+    .animate-fade-in-up,
+    .animate-scale-in {
         animation-fill-mode: forwards;
         opacity: 0;
     }
