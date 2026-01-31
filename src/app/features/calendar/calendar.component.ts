@@ -29,7 +29,7 @@ export class CalendarComponent {
   dailyRoutines = computed(() => {
     const list = this.storage.routines();
     const date = this.selectedDate();
-    return list.filter(r => r.isActive && this.isRoutineDue(r, date, new Date(r.startDate)));
+    return list.filter(r => r.isActive !== false && this.isRoutineDue(r, date, new Date(r.startDate)));
   });
 
   calendarOptions = signal<CalendarOptions>({
@@ -147,10 +147,24 @@ export class CalendarComponent {
   }
 
   isRoutineDue(routine: Routine, date: Date, startDate: Date): boolean {
-    const dayOfWeek = date.getDay(); // 0=Sun...
+    // Normalizasyon (Saatleri sıfırla)
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
 
-    // Check end date if exists
-    if (routine.endDate && new Date(routine.endDate) < date) return false;
+    const rStart = new Date(startDate);
+    rStart.setHours(0, 0, 0, 0);
+
+    // KURAL 1: Henüz başlamamışsa gösterme
+    if (checkDate.getTime() < rStart.getTime()) return false;
+
+    // KURAL 2: Bitiş tarihi varsa ve geçildiyse gösterme
+    // if (routine.endDate) {
+    //   const endDate = new Date(routine.endDate);
+    //   endDate.setHours(0, 0, 0, 0);
+    //   if (checkDate.getTime() > endDate.getTime()) return false;
+    // }
+
+    const dayOfWeek = checkDate.getDay(); // 0=Pazar
 
     switch (routine.frequencyType) {
       case 'DAILY':
@@ -163,14 +177,14 @@ export class CalendarComponent {
         return (routine.specificDays || []).includes(dayOfWeek);
       case 'INTERVAL':
         if (!routine.intervalDays) return false;
-        // Diff in days could be tricky with timezones, let's normalize to UTC if needed
-        // But for now local day diff:
-        const oneDay = 24 * 60 * 60 * 1000;
-        // floor to ignore time part
-        const diffTime = Math.floor(date.getTime() / oneDay) - Math.floor(startDate.getTime() / oneDay);
-        // Must be non-negative match
-        if (diffTime < 0) return false;
-        return diffTime % routine.intervalDays === 0;
+
+        // Math.abs YERİNE sadece geçen gün farkına bak
+        const oneDay = 1000 * 60 * 60 * 24;
+        const diffTime = checkDate.getTime() - rStart.getTime();
+        const diffDays = Math.round(diffTime / oneDay);
+
+        if (diffDays < 0) return false; // Başlamadı
+        return diffDays % routine.intervalDays === 0;
       default:
         return false;
     }

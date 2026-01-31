@@ -32,21 +32,44 @@ export class HomeComponent {
   // Bugünün rutinlerini filtrele
   todaysRoutines = computed(() => {
     const routines = this.storage.routines();
-    const dayIndex = this.today.getDay(); // 0=Pazar, 1=Pzt...
+
+    // Bugünü saatlerden arındırarak al
+    const todayZero = new Date(this.today);
+    todayZero.setHours(0, 0, 0, 0);
+
+    const dayIndex = todayZero.getDay(); // 0=Pazar, 1=Pzt...
 
     return routines.filter(r => {
-      if (!r.isActive) return false;
+      // isActive undefined ise true kabul et (varsayılan: true)
+      if (r.isActive === false) return false;
 
-      // Sıklığa göre bugün görünmeli mi?
+      // Başlangıç tarihini saatlerden arındır
+      const startDate = new Date(r.startDate);
+      startDate.setHours(0, 0, 0, 0);
+
+      // KURAL 1: Başlangıç tarihi bugünden büyükse (gelecekteyse) GÖSTERME
+      if (startDate > todayZero) return false;
+
+      // KURAL 2: Bitiş tarihi varsa ve bugün geçildiyse GÖSTERME
+      // if (r.endDate) {
+      //   const endDate = new Date(r.endDate);
+      //   endDate.setHours(0, 0, 0, 0);
+      //   if (todayZero > endDate) return false;
+      // }
+
+      // Sıklık Kontrolü
       switch (r.frequencyType) {
         case 'DAILY': return true;
         case 'WEEKDAYS': return dayIndex >= 1 && dayIndex <= 5;
         case 'WEEKENDS': return dayIndex === 0 || dayIndex === 6;
         case 'SPECIFIC_DAYS': return r.specificDays?.includes(dayIndex);
         case 'INTERVAL':
-          const start = new Date(r.startDate);
-          const diffTime = Math.abs(this.today.getTime() - start.getTime());
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          // Doğru gün farkı hesabı (Math.abs KULLANMA!)
+          const oneDay = 1000 * 60 * 60 * 24;
+          const diffTime = todayZero.getTime() - startDate.getTime();
+          const diffDays = Math.round(diffTime / oneDay);
+
+          if (diffDays < 0) return false; // Gelecek kontrolü (yukarıda yaptık ama garanti olsun)
           return diffDays % (r.intervalDays || 1) === 0;
         default: return false;
       }
