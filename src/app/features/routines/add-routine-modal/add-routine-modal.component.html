@@ -75,7 +75,12 @@
                         <label class="form-label fw-bold small text-muted">{{ t.t('EVERY_HOW_MANY_DAYS') }}</label>
                         <div class="input-group">
                             <input type="number" class="form-control" formControlName="intervalDays" min="2">
-                            <span class="input-group-text">{{ t.t('DAYS_SUFFIX') }}</span>
+                            <select class="form-select bg-theme-secondary" formControlName="intervalUnit"
+                                style="flex: 0 0 auto; width: auto; min-width: 140px;">
+                                @for (u of intervalUnits; track u.value) {
+                                <option [value]="u.value">{{ u.label }}</option>
+                                }
+                            </select>
                         </div>
                     </div>
                     }

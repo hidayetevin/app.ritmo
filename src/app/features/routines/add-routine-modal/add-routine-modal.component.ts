@@ -28,6 +28,12 @@ export class AddRoutineModalComponent implements OnInit {
     { value: 'INTERVAL', label: this.t.t('INTERVAL') }
   ];
 
+  intervalUnits = [
+    { value: 'MINUTE', label: this.t.t('UNIT_MINUTE') },
+    { value: 'HOUR', label: this.t.t('UNIT_HOUR') },
+    { value: 'DAY', label: this.t.t('UNIT_DAY') }
+  ];
+
   colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A1', '#33FFF6', '#FFC300', '#DAF7A6'];
 
   days = [
@@ -53,6 +59,7 @@ export class AddRoutineModalComponent implements OnInit {
       frequencyType: ['DAILY', Validators.required],
       specificDays: [[]],
       intervalDays: [2],
+      intervalUnit: ['DAY', Validators.required],
       startDate: [new Date().toISOString().split('T')[0], Validators.required]
     });
   }

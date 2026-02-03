@@ -8,6 +8,7 @@ export interface Routine {
     frequencyType: FrequencyType;
     specificDays?: number[]; // 0=Sun, 1=Mon...
     intervalDays?: number; // Days between routines
+    intervalUnit?: 'MINUTE' | 'HOUR' | 'DAY'; // Unit of interval
     startDate: string; // ISO Date string
     endDate?: string;
     time: string; // HH:mm
