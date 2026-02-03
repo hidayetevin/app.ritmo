@@ -5,7 +5,7 @@
             <h5 class="card-title fw-light">{{ t.t('WELCOME') }}</h5>
             <p class="display-6 fw-bold mb-0 text-capitalize">{{ today | date:'EEEE, d MMMM' }}</p>
             <p class="mt-2 mb-0 opacity-75">
-                Bugün <span class="fw-bold">{{ completedCount }} / {{ activeRoutinesCount }}</span> rutin tamamlandı.
+                {{ t.t('TODAY_SUMMARY', { completed: completedCount, total: activeRoutinesCount || 0 }) }}
             </p>
             <div class="progress mt-3 bg-white bg-opacity-25" style="height: 6px;">
                 <div class="progress-bar bg-white" role="progressbar"
@@ -16,7 +16,7 @@
 
     <!-- Today's List -->
     <div class="mb-4 animate-fade-in-up stagger-1">
-        <h6 class="text-muted text-uppercase small fw-bold mb-3">Bugün Ne Var?</h6>
+        <h6 class="text-muted text-uppercase small fw-bold mb-3">{{ t.t('WHATS_TODAY') }}</h6>
 
         @if (todaysRoutines().length > 0) {
         <div class="d-flex flex-column gap-2">
@@ -40,7 +40,8 @@
                     </div>
 
                     @if (isCompleted(routine)) {
-                    <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">BİTTİ</span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">{{
+                        t.t('STATUS_DONE') }}</span>
                     }
                 </div>
             </div>
@@ -49,7 +50,7 @@
         } @else {
         <div class="card border-0 shadow-sm bg-theme-secondary py-4 text-center">
             <i class="bi bi-emoji-smile fs-2 text-muted mb-2"></i>
-            <p class="text-muted small mb-0">Harika! Bugün için planlanan tüm işlerini bitirdin.</p>
+            <p class="text-muted small mb-0">{{ t.t('ALL_DONE_MSG') }}</p>
         </div>
         }
     </div>
@@ -60,14 +61,14 @@
             <i class="bi bi-plus-circle-fill fs-1 me-3 text-primary animate-pulse-soft"></i>
             <div class="text-start">
                 <div class="fw-bold">{{ t.t('ADD_ROUTINE') }}</div>
-                <small class="text-muted">Kişisel hedeflerin için bir adım at</small>
+                <small class="text-muted">{{ t.t('ADD_ROUTINE_SUBTITLE') }}</small>
             </div>
         </button>
     </div>
 
     <!-- How to Use Section -->
     <div class="mt-4 stagger-3 animate-fade-in-up">
-        <h6 class="text-muted text-uppercase small fw-bold mb-3">Nasıl Kullanılır?</h6>
+        <h6 class="text-muted text-uppercase small fw-bold mb-3">{{ t.t('HOW_TO_USE') }}</h6>
         <div class="row g-3">
             <div class="col-12">
                 <div class="card border-0 shadow-sm card-hover bg-theme-secondary">
@@ -75,9 +76,8 @@
                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
                             style="width: 32px; height: 32px; flex-shrink: 0;">1</div>
                         <div>
-                            <p class="mb-0 fw-bold">Rutinlerini Tanımla</p>
-                            <small class="text-muted">"+" butonuna basarak ilk rutini oluştur. Sıklığını ve saatini
-                                ayarla.</small>
+                            <p class="mb-0 fw-bold">{{ t.t('STEP_1_TITLE') }}</p>
+                            <small class="text-muted">{{ t.t('STEP_1_DESC') }}</small>
                         </div>
                     </div>
                 </div>
@@ -88,9 +88,8 @@
                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
                             style="width: 32px; height: 32px; flex-shrink: 0;">2</div>
                         <div>
-                            <p class="mb-0 fw-bold">Takip Et ve Tamamla</p>
-                            <small class="text-muted">Ana sayfadaki listeden rutinine dokunarak "BİTTİ" olarak
-                                işaretle.</small>
+                            <p class="mb-0 fw-bold">{{ t.t('STEP_2_TITLE') }}</p>
+                            <small class="text-muted">{{ t.t('STEP_2_DESC') }}</small>
                         </div>
                     </div>
                 </div>
@@ -101,9 +100,8 @@
                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
                             style="width: 32px; height: 32px; flex-shrink: 0;">3</div>
                         <div>
-                            <p class="mb-0 fw-bold">Gelişimini İzle</p>
-                            <small class="text-muted">"Başarı" sekmesinden haftalık performansını ve en istikrarlı
-                                rutinlerini gör.</small>
+                            <p class="mb-0 fw-bold">{{ t.t('STEP_3_TITLE') }}</p>
+                            <small class="text-muted">{{ t.t('STEP_3_DESC') }}</small>
                         </div>
                     </div>
                 </div>
@@ -113,14 +111,14 @@
 
     <!-- Tips Section -->
     <div class="mt-4 stagger-4 animate-fade-in-up">
-        <h6 class="text-muted text-uppercase small fw-bold mb-3">Günün İpucu</h6>
+        <h6 class="text-muted text-uppercase small fw-bold mb-3">{{ t.t('TIP_OF_THE_DAY') }}</h6>
         <div class="card border-0 shadow-sm card-hover">
             <div class="card-body">
                 <div class="d-flex">
                     <i class="bi bi-lightbulb-fill text-warning fs-3 me-3 animate-pulse-soft"></i>
                     <div>
-                        <p class="mb-0 fw-medium">Küçük Adımlar</p>
-                        <small class="text-muted">Büyük değişimler, her gün yapılan küçük rutinlerle başlar.</small>
+                        <p class="mb-0 fw-medium">{{ t.t('TIP_TITLE') }}</p>
+                        <small class="text-muted">{{ t.t('TIP_DESC') }}</small>
                     </div>
                 </div>
             </div>

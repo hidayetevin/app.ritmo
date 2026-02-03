@@ -83,7 +83,7 @@ export class RoutineListComponent implements OnInit {
       case 'WEEKDAYS': return this.t.t('WEEKDAYS');
       case 'WEEKENDS': return this.t.t('WEEKENDS');
       case 'SPECIFIC_DAYS': return this.t.t('SPECIFIC_DAYS');
-      case 'INTERVAL': return `${routine.intervalDays} ${this.t.currentLang() === 'tr' ? 'günde bir' : 'days'}`;
+      case 'INTERVAL': return this.t.t('EVERY_X_DAYS', { days: routine.intervalDays });
       default: return '';
     }
   }
