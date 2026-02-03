@@ -70,7 +70,11 @@ export class TranslationService {
             'CALENDAR_FOOTER_NOTE': 'Rutinin üzerine tıklayarak durumunu değiştirebilirsin.',
             'UPDATE': 'Güncelle',
             'EVERY_X_DAYS': '{{days}} günde bir',
-            'DELETE_CONFIRM': 'Rutini silmek istediğine emin misin?'
+            'DELETE_CONFIRM': 'Rutini silmek istediğine emin misin?',
+            'EVERY_HOW_MANY_DAYS': 'Kaç günde bir?',
+            'DAYS_SUFFIX': 'günde bir',
+            'DAYS_LABEL': 'Günler',
+            'PLACEHOLDER_TITLE': 'Örn: Su İç, Kitap Oku...'
         },
         en: {
             'APP_NAME': 'Ritmo',
@@ -130,7 +134,11 @@ export class TranslationService {
             'CALENDAR_FOOTER_NOTE': 'You can change status by clicking on the routine.',
             'UPDATE': 'Update',
             'EVERY_X_DAYS': 'Every {{days}} days',
-            'DELETE_CONFIRM': 'Are you sure you want to delete this routine?'
+            'DELETE_CONFIRM': 'Are you sure you want to delete this routine?',
+            'EVERY_HOW_MANY_DAYS': 'Interval (Days)',
+            'DAYS_SUFFIX': 'days',
+            'DAYS_LABEL': 'Days',
+            'PLACEHOLDER_TITLE': 'E.g. Drink Water, Read Book...'
         }
     };
 

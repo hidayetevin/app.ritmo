@@ -1,7 +1,7 @@
 <div class="modal d-block animate-fade-in" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
     <div class="modal-dialog modal-dialog-centered modal-lg animate-scale-in" role="document">
         <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-light">
+            <div class="modal-header bg-theme-secondary">
                 <h5 class="modal-title fw-bold text-primary">{{ routineToEdit ? t.t('EDIT_ROUTINE') : t.t('ADD_ROUTINE')
                     }}
                 </h5>
@@ -15,7 +15,7 @@
                     <div class="mb-3 animate-fade-in-up stagger-1">
                         <label class="form-label fw-bold small text-muted">{{ t.t('TITLE') }}</label>
                         <input type="text" class="form-control form-control-lg fw-bold" formControlName="title"
-                            placeholder="Örn: Su İç, Kitap Oku...">
+                            [placeholder]="t.t('PLACEHOLDER_TITLE')">
                     </div>
 
                     <div class="row">
@@ -54,8 +54,8 @@
 
                     <!-- Specific Days -->
                     @if (form.get('frequencyType')?.value === 'SPECIFIC_DAYS') {
-                    <div class="mb-3 p-3 bg-light rounded animate-scale-in">
-                        <label class="d-block small fw-bold text-muted mb-2">Günler</label>
+                    <div class="mb-3 p-3 bg-theme-secondary rounded animate-scale-in">
+                        <label class="d-block small fw-bold text-muted mb-2">{{ t.t('DAYS_LABEL') }}</label>
                         <div class="btn-group w-100" role="group">
                             @for (day of days; track day) {
                             <button type="button" class="btn btn-sm btn-shrink"
@@ -71,11 +71,11 @@
 
                     <!-- Interval -->
                     @if (form.get('frequencyType')?.value === 'INTERVAL') {
-                    <div class="mb-3 p-3 bg-light rounded animate-scale-in">
-                        <label class="form-label fw-bold small text-muted">Kaç günde bir?</label>
+                    <div class="mb-3 p-3 bg-theme-secondary rounded animate-scale-in">
+                        <label class="form-label fw-bold small text-muted">{{ t.t('EVERY_HOW_MANY_DAYS') }}</label>
                         <div class="input-group">
                             <input type="number" class="form-control" formControlName="intervalDays" min="2">
-                            <span class="input-group-text">günde bir</span>
+                            <span class="input-group-text">{{ t.t('DAYS_SUFFIX') }}</span>
                         </div>
                     </div>
                     }
