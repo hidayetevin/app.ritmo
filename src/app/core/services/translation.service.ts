@@ -47,7 +47,8 @@ export class TranslationService {
             'SOUND': 'Sesler',
             'VIBRATION': 'Titreşim',
             'LANGUAGE': 'Uygulama Dili',
-            'REKRUM_ALANI': 'Reklam Alanı'
+            'REKRUM_ALANI': 'Reklam Alanı',
+            'TODAY': 'Bugün'
         },
         en: {
             'APP_NAME': 'Ritmo',
@@ -84,7 +85,8 @@ export class TranslationService {
             'SOUND': 'Sound',
             'VIBRATION': 'Vibration',
             'LANGUAGE': 'App Language',
-            'REKRUM_ALANI': 'Ad Zone'
+            'REKRUM_ALANI': 'Ad Zone',
+            'TODAY': 'Today'
         }
     };
 

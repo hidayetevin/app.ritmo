@@ -4,6 +4,7 @@ import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { StorageService } from '../../core/services/storage.service';
+import { TranslationService } from '../../core/services/translation.service';
 import { Routine } from '../../core/models/routine.model';
 import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
 import localeTr from '@angular/common/locales/tr';
@@ -19,6 +20,7 @@ registerLocaleData(localeTr);
 })
 export class CalendarComponent {
   storage = inject(StorageService);
+  t = inject(TranslationService);
 
   // Tabs: 'list' | 'calendar'
   activeTab = signal<'list' | 'calendar'>('list');
@@ -35,6 +37,7 @@ export class CalendarComponent {
   calendarOptions = signal<CalendarOptions>({
     plugins: [dayGridPlugin, interactionPlugin],
     initialView: 'dayGridMonth',
+    displayEventTime: false,
     headerToolbar: {
       left: 'prev,next',
       center: 'title',
@@ -63,7 +66,26 @@ export class CalendarComponent {
       // Trigger calendar refresh
       this.calendarOptions.update(opts => ({
         ...opts,
-        events: this.loadEvents.bind(this)
+        events: this.loadEvents.bind(this),
+        buttonText: {
+          today: this.t.t('TODAY')
+        }
+      }));
+    });
+
+    // Listen for language changes to update calendar text
+    effect(() => {
+      const lang = this.t.currentLang(); // dependency
+      this.calendarOptions.update(opts => ({
+        ...opts,
+        buttonText: {
+          today: this.t.t('TODAY'),
+          month: 'Ay',
+          week: 'Hafta',
+          day: 'Gün',
+          list: 'Liste'
+        },
+        locale: lang
       }));
     });
   }
