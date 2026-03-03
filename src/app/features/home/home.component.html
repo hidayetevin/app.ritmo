@@ -21,6 +21,9 @@
         @if (todaysRoutines().length > 0) {
         <div class="d-flex flex-column gap-2">
             @for (routine of todaysRoutines(); track routine.id; let idx = $index) {
+
+            <!-- ===== NORMAL RUTİN KARTI (HOURLY olmayan) ===== -->
+            @if (routine.frequencyType !== 'HOURLY') {
             <div class="card border-0 shadow-sm animate-scale-in" [style.animation-delay]="(idx * 0.1) + 's'"
                 [class.opacity-75]="isCompleted(routine)">
                 <div class="card-body py-3 d-flex align-items-center" (click)="toggleComplete(routine)">
@@ -45,6 +48,107 @@
                     }
                 </div>
             </div>
+            }
+
+            <!-- ===== HOURLY RUTİN KARTI ===== -->
+            @if (routine.frequencyType === 'HOURLY') {
+            <div class="card border-0 shadow-sm animate-scale-in" [style.animation-delay]="(idx * 0.1) + 's'"
+                style="border-left: 4px solid var(--routine-color) !important;" [style.--routine-color]="routine.color">
+
+                <!-- Renk şeridi -->
+                <div [style.background-color]="routine.color" style="height: 4px;" class="rounded-top"></div>
+
+                <div class="card-body py-3">
+                    <!-- Başlık ve interval bilgisi -->
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="mb-0 fw-bold">{{ routine.title }}</h6>
+                            <small class="text-muted">
+                                <i class="bi bi-clock-history me-1"></i>
+                                @if (routine.intervalUnit === 'HOURS') {
+                                {{ t.t('EVERY_X_HOURS', { n: routine.intervalValue }) }}
+                                } @else {
+                                {{ t.t('EVERY_X_MINUTES', { n: routine.intervalValue }) }}
+                                }
+                            </small>
+                        </div>
+                        <span class="badge rounded-pill text-white" [style.background-color]="routine.color">
+                            {{ t.t('ACTIVE_WINDOW', { start: routine.activeHoursStart, end: routine.activeHoursEnd }) }}
+                        </span>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between small text-muted mb-1">
+                            <span class="fw-medium">
+                                {{ t.t('HOURLY_PROGRESS', {
+                                completed: getHourlyProgressFor(routine).completed,
+                                total: getHourlyProgressFor(routine).total
+                                }) }}
+                            </span>
+                            <span>{{ getProgressPercent(routine) }}%</span>
+                        </div>
+                        <div class="progress" style="height: 8px; border-radius: 4px;">
+                            <div class="progress-bar" role="progressbar" [style.width.%]="getProgressPercent(routine)"
+                                [style.background-color]="routine.color"
+                                style="transition: width 0.5s ease; border-radius: 4px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sonraki occurrence & Tamamla Butonu -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            @if (isBeforeActiveWindow(routine)) {
+                            <!-- Henüz aktif pencere başlamadı -->
+                            <small class="text-muted">
+                                <i class="bi bi-hourglass me-1"></i>
+                                {{ routine.activeHoursStart }}'de başlayacak
+                            </small>
+                            } @else if (isAfterActiveWindow(routine)) {
+                            <!-- Aktif pencere bitti -->
+                            <small class="text-success fw-bold">
+                                <i class="bi bi-check-circle me-1"></i>
+                                {{ t.t('PERIOD_COMPLETED_TODAY') }}
+                            </small>
+                            } @else if (getNextOccurrenceFor(routine)) {
+                            <!-- Sonraki occurrence zamanı -->
+                            <small class="text-muted">
+                                <i class="bi bi-arrow-right-circle me-1"></i>
+                                {{ t.t('NEXT_OCCURRENCE') }}: <strong>{{ getNextOccurrenceFor(routine) }}</strong>
+                            </small>
+                            } @else {
+                            <!-- Bugün tüm occurrence'lar bitti -->
+                            <small class="text-success fw-bold">
+                                <i class="bi bi-check-circle me-1"></i>
+                                {{ t.t('PERIOD_COMPLETED_TODAY') }}
+                            </small>
+                            }
+                        </div>
+
+                        <!-- Tamamla / BİTTİ Aksiyon Alanı -->
+                        <div>
+                            @if (!isBeforeActiveWindow(routine) && !isAfterActiveWindow(routine) &&
+                            getCurrentOccurrenceFor(routine)) {
+                            @if (isCurrentOccurrenceCompletedFor(routine)) {
+                            <!-- Mevcut occurrence tamamlandı -->
+                            <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">
+                                ✅ {{ t.t('STATUS_DONE') }}
+                            </span>
+                            } @else {
+                            <!-- Tamamla butonu -->
+                            <button class="btn btn-sm btn-primary btn-shrink px-3 shadow-sm"
+                                (click)="toggleHourlyComplete(routine)">
+                                <i class="bi bi-check2 me-1"></i>{{ t.t('HOURLY_COMPLETE_BTN') }}
+                            </button>
+                            }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
+
             }
         </div>
         } @else {
@@ -124,4 +228,5 @@
             </div>
         </div>
     </div>
+
 </div>

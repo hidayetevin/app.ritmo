@@ -74,7 +74,24 @@ export class TranslationService {
             'EVERY_HOW_MANY_DAYS': 'Kaç günde bir?',
             'DAYS_SUFFIX': 'günde bir',
             'DAYS_LABEL': 'Günler',
-            'PLACEHOLDER_TITLE': 'Örn: Su İç, Kitap Oku...'
+            'PLACEHOLDER_TITLE': 'Örn: Su İç, Kitap Oku...',
+            'HOURLY': 'Saatlik / Dakikalık',
+            'INTERVAL_UNIT': 'Aralık Birimi',
+            'HOURS': 'Saat',
+            'MINUTES': 'Dakika',
+            'INTERVAL_VALUE_HOURS': 'Kaç saatte bir? (1–12)',
+            'INTERVAL_VALUE_MINUTES': 'Dakika aralığı seç',
+            'ACTIVE_HOURS_RANGE': 'Aktif Saat Aralığı',
+            'ACTIVE_HOURS_START': 'Başlangıç Saati',
+            'ACTIVE_HOURS_END': 'Bitiş Saati',
+            'EVERY_X_HOURS': 'Her {{n}} saatte bir',
+            'EVERY_X_MINUTES': 'Her {{n}} dakikada bir',
+            'NEXT_OCCURRENCE': 'Sonraki',
+            'PERIOD_COMPLETED_TODAY': 'Bugün tamamlandı 🎉',
+            'HOURLY_COMPLETE_BTN': 'Tamamla',
+            'HOURLY_PROGRESS': '{{completed}}/{{total}} tamamlandı',
+            'ACTIVE_WINDOW': '{{start}} – {{end}} arası aktif',
+            'WAITING_NEXT': 'Sonraki occurrence bekleniyor'
         },
         en: {
             'APP_NAME': 'Ritmo',
@@ -138,7 +155,24 @@ export class TranslationService {
             'EVERY_HOW_MANY_DAYS': 'Interval (Days)',
             'DAYS_SUFFIX': 'days',
             'DAYS_LABEL': 'Days',
-            'PLACEHOLDER_TITLE': 'E.g. Drink Water, Read Book...'
+            'PLACEHOLDER_TITLE': 'E.g. Drink Water, Read Book...',
+            'HOURLY': 'Hourly / By Minute',
+            'INTERVAL_UNIT': 'Interval Unit',
+            'HOURS': 'Hours',
+            'MINUTES': 'Minutes',
+            'INTERVAL_VALUE_HOURS': 'Every how many hours? (1–12)',
+            'INTERVAL_VALUE_MINUTES': 'Select minute interval',
+            'ACTIVE_HOURS_RANGE': 'Active Hours Range',
+            'ACTIVE_HOURS_START': 'Start Time',
+            'ACTIVE_HOURS_END': 'End Time',
+            'EVERY_X_HOURS': 'Every {{n}} hour(s)',
+            'EVERY_X_MINUTES': 'Every {{n}} minute(s)',
+            'NEXT_OCCURRENCE': 'Next',
+            'PERIOD_COMPLETED_TODAY': 'All done for today 🎉',
+            'HOURLY_COMPLETE_BTN': 'Complete',
+            'HOURLY_PROGRESS': '{{completed}}/{{total}} completed',
+            'ACTIVE_WINDOW': 'Active {{start}} – {{end}}',
+            'WAITING_NEXT': 'Waiting for next occurrence'
         }
     };
 

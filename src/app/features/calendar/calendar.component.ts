@@ -8,6 +8,7 @@ import { TranslationService } from '../../core/services/translation.service';
 import { Routine } from '../../core/models/routine.model';
 import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
 import localeTr from '@angular/common/locales/tr';
+import { getOccurrenceTimesForDay, getHourlyProgress } from '../../core/utils/routine.utils';
 
 registerLocaleData(localeTr);
 
@@ -27,6 +28,10 @@ export class CalendarComponent {
 
   // Selected Date for List Viewer
   selectedDate = signal<Date>(new Date());
+
+  // HOURLY Tamamlama Modalı
+  isHourlyModalOpen = signal(false);
+  selectedHourlyRoutine = signal<Routine | null>(null);
 
   dailyRoutines = computed(() => {
     const list = this.storage.routines();
@@ -115,6 +120,61 @@ export class CalendarComponent {
     return (routine.completionHistory || []).includes(isoDate);
   }
 
+  // --- HOURLY: Günlük Liste yardımcı metodları ---
+
+  getSelectedDateIso(): string {
+    return this.selectedDate().toISOString().split('T')[0];
+  }
+
+  getHourlyProgressForDate(routine: Routine): { completed: number; total: number } {
+    return getHourlyProgress(routine, this.getSelectedDateIso());
+  }
+
+  getHourlyProgressPercent(routine: Routine): number {
+    const p = getHourlyProgress(routine, this.getSelectedDateIso());
+    if (p.total === 0) return 0;
+    return Math.round((p.completed / p.total) * 100);
+  }
+
+  // --- HOURLY Tamamlama Modalı ---
+
+  openHourlyOccurrenceModal(routine: Routine) {
+    this.selectedHourlyRoutine.set(routine);
+    this.isHourlyModalOpen.set(true);
+  }
+
+  closeHourlyModal() {
+    this.isHourlyModalOpen.set(false);
+    this.selectedHourlyRoutine.set(null);
+  }
+
+  /** Tüm occurrence slotlarını tamamlanma durumuyla birlikte döndürür */
+  getOccurrencesWithStatus(routine: Routine): { time: string; isDone: boolean; key: string; isPast: boolean }[] {
+    if (routine.frequencyType !== 'HOURLY') return [];
+    const dateIso = this.getSelectedDateIso();
+    const times = getOccurrenceTimesForDay(routine);
+    const now = new Date();
+    const isToday = dateIso === now.toISOString().split('T')[0];
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    return times.map(time => {
+      const [h, m] = time.split(':').map(Number);
+      const key = `${dateIso}T${time}`;
+      const timeMinutes = h * 60 + m;
+      return {
+        time,
+        isDone: (routine.completionHistory || []).includes(key),
+        key,
+        // Geçmiş: bugün ise ve zaman geçmişse, ya da bugün değilse (geçmiş gün)
+        isPast: isToday ? timeMinutes <= currentMinutes : dateIso < now.toISOString().split('T')[0]
+      };
+    });
+  }
+
+  toggleOccurrenceCompletion(routineId: string, key: string) {
+    this.storage.toggleRoutineCompletion(routineId, key);
+  }
+
   // --- Calendar Logic ---
 
   loadEvents(info: any, successCallback: any, failureCallback: any) {
@@ -153,25 +213,66 @@ export class CalendarComponent {
         // isRoutineDue zaten tarih kontrollerini yapıyor
         if (this.isRoutineDue(routine, current, rStart)) {
           const dateStr = current.toISOString().split('T')[0];
-          const isDone = (routine.completionHistory || []).includes(dateStr);
 
-          // Rutin saatini ayarla
-          const [hours, mins] = routine.time.split(':').map(Number);
-          const eventDate = new Date(current);
-          eventDate.setHours(hours, mins);
+          if (routine.frequencyType === 'HOURLY') {
+            // HOURLY: Günlük TEK event — başlıkta X/Y progress sayacı
+            const occurrenceTimes = getOccurrenceTimesForDay(routine);
+            const total = occurrenceTimes.length;
+            const completedCount = occurrenceTimes.filter(time =>
+              (routine.completionHistory || []).includes(`${dateStr}T${time}`)
+            ).length;
 
-          events.push({
-            id: routine.id,
-            title: isDone ? `✔ ${routine.title}` : routine.title,
-            start: eventDate.toISOString(),
-            color: isDone ? '#198754' : routine.color, // Bootstrap success color
-            extendedProps: {
-              routineId: routine.id,
-              originalColor: routine.color,
-              isDone: isDone
-            },
-            allDay: false
-          });
+            // Renk: tamamına göre → yeşil / kısmen → rutin rengi / hiç → soluk
+            const eventColor = completedCount === total && total > 0
+              ? '#198754'
+              : completedCount > 0
+                ? routine.color
+                : routine.color + '99'; // %60 opacity hex
+
+            // Başlık: ilerleyişi göster
+            const progressIcon = completedCount === total && total > 0 ? '✔ ' : '';
+            const progressTitle = `${progressIcon}${routine.title} ${completedCount}/${total}`;
+
+            // Olayı activeHoursStart zamanında başlat
+            const [startH, startM] = (routine.activeHoursStart || '08:00').split(':').map(Number);
+            const eventDate = new Date(current);
+            eventDate.setHours(startH, startM);
+
+            events.push({
+              id: `${routine.id}-${dateStr}`,
+              title: progressTitle,
+              start: eventDate.toISOString(),
+              color: eventColor,
+              extendedProps: {
+                routineId: routine.id,
+                originalColor: routine.color,
+                isHourly: true,
+                completed: completedCount,
+                total: total,
+                dateStr: dateStr
+              },
+              allDay: false
+            });
+          } else {
+            // Normal rutin: tek event
+            const isDone = (routine.completionHistory || []).includes(dateStr);
+            const [hours, mins] = routine.time.split(':').map(Number);
+            const eventDate = new Date(current);
+            eventDate.setHours(hours, mins);
+
+            events.push({
+              id: routine.id,
+              title: isDone ? `✔ ${routine.title}` : routine.title,
+              start: eventDate.toISOString(),
+              color: isDone ? '#198754' : routine.color, // Bootstrap success color
+              extendedProps: {
+                routineId: routine.id,
+                originalColor: routine.color,
+                isDone: isDone
+              },
+              allDay: false
+            });
+          }
         }
 
         // Bir sonraki güne geç
@@ -221,6 +322,9 @@ export class CalendarComponent {
 
         if (diffDays < 0) return false; // Başlamadı
         return diffDays % routine.intervalDays === 0;
+      case 'HOURLY':
+        // HOURLY rutinler başlangıç tarihinden itibaren her gün takvimde görünür
+        return true;
       default:
         return false;
     }

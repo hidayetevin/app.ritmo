@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { TranslationService } from '../../../core/services/translation.service';
 import { AdService } from '../../../core/services/ad.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { getHourlyLabel } from '../../../core/utils/routine.utils';
 
 @Component({
   selector: 'app-routine-list',
@@ -84,6 +85,7 @@ export class RoutineListComponent implements OnInit {
       case 'WEEKENDS': return this.t.t('WEEKENDS');
       case 'SPECIFIC_DAYS': return this.t.t('SPECIFIC_DAYS');
       case 'INTERVAL': return this.t.t('EVERY_X_DAYS', { days: routine.intervalDays });
+      case 'HOURLY': return getHourlyLabel(routine, this.t.currentLang());
       default: return '';
     }
   }

@@ -25,7 +25,8 @@ export class AddRoutineModalComponent implements OnInit {
     { value: 'WEEKDAYS', label: this.t.t('WEEKDAYS') },
     { value: 'WEEKENDS', label: this.t.t('WEEKENDS') },
     { value: 'SPECIFIC_DAYS', label: this.t.t('SPECIFIC_DAYS') },
-    { value: 'INTERVAL', label: this.t.t('INTERVAL') }
+    { value: 'INTERVAL', label: this.t.t('INTERVAL') },
+    { value: 'HOURLY', label: this.t.t('HOURLY') }   // YENİ
   ];
 
   colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A1', '#33FFF6', '#FFC300', '#DAF7A6'];
@@ -34,6 +35,12 @@ export class AddRoutineModalComponent implements OnInit {
     { index: 1, name: 'Pzt' }, { index: 2, name: 'Sal' }, { index: 3, name: 'Çar' },
     { index: 4, name: 'Per' }, { index: 5, name: 'Cum' }, { index: 6, name: 'Cmt' }, { index: 0, name: 'Paz' }
   ];
+
+  // HOURLY - Dakika seçenekleri (sabit liste)
+  minuteOptions = [10, 20, 30, 40, 50];
+
+  // HOURLY - Saat seçenekleri (1-12)
+  hourOptions = [1, 2, 3, 4, 6, 8, 12];
 
   ngOnInit() {
     this.initForm();
@@ -53,8 +60,21 @@ export class AddRoutineModalComponent implements OnInit {
       frequencyType: ['DAILY', Validators.required],
       specificDays: [[]],
       intervalDays: [2],
-      startDate: [new Date().toISOString().split('T')[0], Validators.required]
+      startDate: [new Date().toISOString().split('T')[0], Validators.required],
+      // --- HOURLY alanları ---
+      intervalUnit: ['HOURS'],
+      intervalValue: [1],
+      activeHoursStart: ['08:00'],
+      activeHoursEnd: ['22:00']
     });
+  }
+
+  get isHourly(): boolean {
+    return this.form.get('frequencyType')?.value === 'HOURLY';
+  }
+
+  get isHourUnit(): boolean {
+    return this.form.get('intervalUnit')?.value === 'HOURS';
   }
 
   toggleDay(dayIndex: number) {
@@ -66,9 +86,20 @@ export class AddRoutineModalComponent implements OnInit {
     }
   }
 
+  onIntervalUnitChange(unit: 'HOURS' | 'MINUTES') {
+    this.form.patchValue({ intervalUnit: unit, intervalValue: unit === 'HOURS' ? 1 : 10 });
+  }
+
   onSubmit() {
     if (this.form.valid) {
-      this.save.emit(this.form.value);
+      const value = this.form.value;
+
+      // HOURLY rutinler için 'time' alanını activeHoursStart ile senkronize et
+      if (value.frequencyType === 'HOURLY') {
+        value.time = value.activeHoursStart || '08:00';
+      }
+
+      this.save.emit(value);
     }
   }
 }

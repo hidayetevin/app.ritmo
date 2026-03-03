@@ -1,13 +1,14 @@
-<div class="modal d-block animate-fade-in" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
-    <div class="modal-dialog modal-dialog-centered modal-lg animate-scale-in" role="document">
+<div class="modal d-block animate-fade-in" tabindex="-1" role="dialog"
+    style="background-color: rgba(0,0,0,0.5); padding-bottom: 75px;">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg animate-scale-in" role="document">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-theme-secondary">
                 <h5 class="modal-title fw-bold text-primary">{{ routineToEdit ? t.t('EDIT_ROUTINE') : t.t('ADD_ROUTINE')
-                    }}
-                </h5>
+                    }}</h5>
                 <button type="button" class="btn-close btn-shrink" aria-label="Close" (click)="cancel.emit()"></button>
             </div>
 
+            <!-- Scrollable body -->
             <div class="modal-body p-4">
                 <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
@@ -45,11 +46,13 @@
                             </select>
                         </div>
 
-                        <!-- Time -->
+                        <!-- Time (HOURLY dışında göster) -->
+                        @if (!isHourly) {
                         <div class="col-md-6 mb-3 animate-fade-in-up stagger-4">
                             <label class="form-label fw-bold small text-muted">{{ t.t('TIME') }}</label>
                             <input type="time" class="form-control" formControlName="time">
                         </div>
+                        }
                     </div>
 
                     <!-- Specific Days -->
@@ -69,7 +72,7 @@
                     </div>
                     }
 
-                    <!-- Interval -->
+                    <!-- Interval (gün bazlı) -->
                     @if (form.get('frequencyType')?.value === 'INTERVAL') {
                     <div class="mb-3 p-3 bg-theme-secondary rounded animate-scale-in">
                         <label class="form-label fw-bold small text-muted">{{ t.t('EVERY_HOW_MANY_DAYS') }}</label>
@@ -80,20 +83,116 @@
                     </div>
                     }
 
+                    <!-- ===== HOURLY Alanları ===== -->
+                    @if (isHourly) {
+                    <div class="mb-3 p-3 border border-primary border-opacity-25 rounded-3 animate-scale-in"
+                        style="background: var(--bs-primary-bg-subtle, #eef3ff);">
+
+                        <!-- Aralık Birimi Seçimi -->
+                        <label class="form-label fw-bold small text-muted d-block mb-2">
+                            <i class="bi bi-clock-history me-1 text-primary"></i>{{ t.t('INTERVAL_UNIT') }}
+                        </label>
+                        <div class="btn-group w-100 mb-3" role="group">
+                            <button type="button" class="btn btn-sm btn-shrink" [class.btn-primary]="isHourUnit"
+                                [class.btn-outline-secondary]="!isHourUnit" (click)="onIntervalUnitChange('HOURS')">
+                                <i class="bi bi-hourglass-split me-1"></i>{{ t.t('HOURS') }}
+                            </button>
+                            <button type="button" class="btn btn-sm btn-shrink" [class.btn-primary]="!isHourUnit"
+                                [class.btn-outline-secondary]="isHourUnit" (click)="onIntervalUnitChange('MINUTES')">
+                                <i class="bi bi-stopwatch me-1"></i>{{ t.t('MINUTES') }}
+                            </button>
+                        </div>
+
+                        <!-- Saat Seçimi -->
+                        @if (isHourUnit) {
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">{{ t.t('INTERVAL_VALUE_HOURS') }}</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                @for (h of hourOptions; track h) {
+                                <button type="button" class="btn btn-sm btn-shrink px-3"
+                                    [class.btn-primary]="form.get('intervalValue')?.value === h"
+                                    [class.btn-outline-secondary]="form.get('intervalValue')?.value !== h"
+                                    (click)="form.patchValue({ intervalValue: h })">
+                                    {{ h }}s
+                                </button>
+                                }
+                            </div>
+                        </div>
+                        }
+
+                        <!-- Dakika Seçimi -->
+                        @if (!isHourUnit) {
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">{{ t.t('INTERVAL_VALUE_MINUTES') }}</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                @for (m of minuteOptions; track m) {
+                                <button type="button" class="btn btn-sm btn-shrink px-3"
+                                    [class.btn-primary]="form.get('intervalValue')?.value === m"
+                                    [class.btn-outline-secondary]="form.get('intervalValue')?.value !== m"
+                                    (click)="form.patchValue({ intervalValue: m })">
+                                    {{ m }}dk
+                                </button>
+                                }
+                            </div>
+                        </div>
+                        }
+
+                        <!-- Aktif Saat Aralığı -->
+                        <label class="form-label small text-muted fw-bold">
+                            <i class="bi bi-calendar-range me-1 text-primary"></i>{{ t.t('ACTIVE_HOURS_RANGE') }}
+                        </label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">{{ t.t('ACTIVE_HOURS_START') }}</label>
+                                <input type="time" class="form-control form-control-sm"
+                                    formControlName="activeHoursStart">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">{{ t.t('ACTIVE_HOURS_END') }}</label>
+                                <input type="time" class="form-control form-control-sm"
+                                    formControlName="activeHoursEnd">
+                            </div>
+                        </div>
+
+                        <!-- Özet bilgi -->
+                        <div class="mt-2 d-flex align-items-center gap-1 text-muted" style="font-size: 0.75rem;">
+                            <i class="bi bi-info-circle text-primary"></i>
+                            <span>
+                                @if (isHourUnit) {
+                                {{ t.t('ACTIVE_WINDOW', { start: form.get('activeHoursStart')?.value, end:
+                                form.get('activeHoursEnd')?.value }) }}
+                                &mdash; her {{ form.get('intervalValue')?.value }} saatte bir
+                                } @else {
+                                {{ t.t('ACTIVE_WINDOW', { start: form.get('activeHoursStart')?.value, end:
+                                form.get('activeHoursEnd')?.value }) }}
+                                &mdash; her {{ form.get('intervalValue')?.value }} dakikada bir
+                                }
+                            </span>
+                        </div>
+                    </div>
+                    }
+                    <!-- ===== /HOURLY Alanları ===== -->
+
                     <!-- Start Date -->
-                    <div class="mb-4 animate-fade-in-up stagger-4">
+                    <div class="mb-2 animate-fade-in-up stagger-4">
                         <label class="form-label fw-bold small text-muted">{{ t.t('START_DATE') }}</label>
                         <input type="date" class="form-control" formControlName="startDate">
                     </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end animate-fade-in-up stagger-4">
-                        <button type="button" class="btn btn-light me-md-2 btn-shrink" (click)="cancel.emit()">{{
-                            t.t('CANCEL') }}</button>
-                        <button type="submit" class="btn btn-primary px-4 shadow btn-shrink"
-                            [disabled]="form.invalid">{{ t.t('SAVE') }}</button>
-                    </div>
                 </form>
             </div>
+
+            <!-- Modal Footer — scroll DIŞINDA sabit, nav bar'ın üstünde her zaman görünür -->
+            <div class="modal-footer bg-theme-secondary border-top d-flex justify-content-end gap-2 py-3">
+                <button type="button" class="btn btn-light btn-shrink px-4" (click)="cancel.emit()">
+                    {{ t.t('CANCEL') }}
+                </button>
+                <button type="button" class="btn btn-primary px-4 shadow btn-shrink" [disabled]="form.invalid"
+                    (click)="onSubmit()">
+                    {{ t.t('SAVE') }}
+                </button>
+            </div>
+
         </div>
     </div>
 </div>
