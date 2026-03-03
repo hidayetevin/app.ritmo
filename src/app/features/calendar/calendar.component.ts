@@ -31,7 +31,13 @@ export class CalendarComponent {
 
   // HOURLY Tamamlama Modalı
   isHourlyModalOpen = signal(false);
-  selectedHourlyRoutine = signal<Routine | null>(null);
+  // Rutin ID'si saklanır; computed storage'dan taze okur (reaktif)
+  selectedHourlyRoutineId = signal<string | null>(null);
+  selectedHourlyRoutine = computed(() => {
+    const id = this.selectedHourlyRoutineId();
+    if (!id) return null;
+    return this.storage.routines().find(r => r.id === id) ?? null;
+  });
 
   dailyRoutines = computed(() => {
     const list = this.storage.routines();
@@ -139,13 +145,13 @@ export class CalendarComponent {
   // --- HOURLY Tamamlama Modalı ---
 
   openHourlyOccurrenceModal(routine: Routine) {
-    this.selectedHourlyRoutine.set(routine);
+    this.selectedHourlyRoutineId.set(routine.id);
     this.isHourlyModalOpen.set(true);
   }
 
   closeHourlyModal() {
     this.isHourlyModalOpen.set(false);
-    this.selectedHourlyRoutine.set(null);
+    this.selectedHourlyRoutineId.set(null);
   }
 
   /** Tüm occurrence slotlarını tamamlanma durumuyla birlikte döndürür */
@@ -154,7 +160,9 @@ export class CalendarComponent {
     const dateIso = this.getSelectedDateIso();
     const times = getOccurrenceTimesForDay(routine);
     const now = new Date();
-    const isToday = dateIso === now.toISOString().split('T')[0];
+    const todayIso = now.toISOString().split('T')[0];
+    const isToday = dateIso === todayIso;
+    const isPastDay = dateIso < todayIso;
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
     return times.map(time => {
@@ -165,8 +173,9 @@ export class CalendarComponent {
         time,
         isDone: (routine.completionHistory || []).includes(key),
         key,
-        // Geçmiş: bugün ise ve zaman geçmişse, ya da bugün değilse (geçmiş gün)
-        isPast: isToday ? timeMinutes <= currentMinutes : dateIso < now.toISOString().split('T')[0]
+        // Geçmiş gün → hepsi "geçmiş". Bugün → sadece zamanı geçmiş.
+        // Görsel ayrım için kullanılır, tıklamayı ENGELLEMEZ.
+        isPast: isPastDay || (isToday && timeMinutes <= currentMinutes)
       };
     });
   }
