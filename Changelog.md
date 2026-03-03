@@ -2,6 +2,38 @@
 
 ---
 
+## [1.2.1] — 2026-03-04
+
+### 🎨 Takvim HOURLY Görünüm İyileştirmeleri
+
+#### Aylık Takvim (FullCalendar)
+- HOURLY rutinler artık her occurrence için ayrı ayrı event oluşturmak yerine **günlük tek event** olarak gösterilir.
+- Event başlığı `Rutin Adı X/Y` formatında günlük tamamlanma sayacı içerir.
+- Renk mantığı: tümü tamamlandıysa 🟢 yeşil, kısmen tamamlandıysa rutin rengi, hiç tamamlanmadıysa rutin rengi (soluk).
+
+#### Günlük Liste
+- HOURLY rutin kartları **progress bar** formatına getirildi:
+  - Üst renkli şerit, aktif saat penceresi badge'i, interval bilgisi.
+  - Tamamlanma yüzdesi progress bar ile gösterilir.
+  - "Tamamlamak için dokun" ipucu eklendi.
+- Normal rutin kartları değişmedi (sıfır regresyon).
+
+#### HOURLY Occurrence Tamamlama Modalı (YENİ)
+- Günlük listede HOURLY rutin kartına tıklayınca **occurrence listesi modalı** açılır.
+- Modalda o günün tüm saat/dakika slotları listelenir:
+  - ✅ **Bitti** — tamamlanan slotlar (yeşil, üzeri çizili)
+  - — **Atlandı** — geçmiş ama tamamlanmamış slotlar (sarı)
+  - ⏳ **Bekliyor** — henüz gelmemiş slotlar (soluk)
+- Her slot tıklanabilir → **tamamla / geri al toggle** (Atlandı ↔ Bitti).
+- Modal tepesinde progress bar ve X/Y sayacı gösterilir.
+- **Reaktif güncelleme:** `selectedHourlyRoutine` artık `computed()` ile storage'dan okunur; her tıklamada modal anlık güncellenir (stale state sorunu giderildi).
+
+#### UX Düzeltmeleri
+- Add Routine Modal'ına `modal-dialog-scrollable` + `padding-bottom: 75px` eklendi → bottom nav bar artık Kaydet butonunu gizlemiyor.
+- İptal/Kaydet butonları `modal-footer`'a taşındı → scroll edilebilir bölgeden bağımsız, her zaman görünür.
+
+---
+
 ## [1.2.0] — 2026-03-04
 
 ### 🆕 Yeni Özellik: Saatlik / Dakikalık Rutin Tipi (`HOURLY`)
